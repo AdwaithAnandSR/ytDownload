@@ -1,63 +1,53 @@
-import express from "express";
-import cors from "cors";
+const express = require("express");
+const { exec } = require("child_process");
 
-import play from "play-dl";
-import {fileTypeFromBuffer} from 'file-type';
-
-
+const port = 3000;
 const app = express();
 
-function convertMobileToDesktopYouTubeUrl(url) {
-    url = url.replace("https://m.youtube.com", "https://www.youtube.com");
-    url = url.replace(/\s/g, "");
-    return url;
-}
+app.use(express.json());
+app.use(require("cors")());
 
-const download = async url => {
-    console.log(`url: ${url}`);
-    // validating
-    if (!(await play.yt_validate(url))) return console.log("not a valid url");
+app.get("/info", async (req, res) => {
+    const { url } = req.query;
 
-    const video = await play.video_basic_info(url);
-    const title = video.video_details.title;
-    const thumbnail = video.video_details.thumbnails.pop().url;
+    if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 
-    // const existsSong = await musicModel.findOne({ title });
-    // if (existsSong)
-    //     return res.status(409).json({ message: "song already exists!", title });
+    const cmd = `yt-dlp --dump-json "${url}"`;
 
-    // 2. Get audio stream
-    const { stream, type } = await play.stream(url, { quality: 2 });
+    exec(cmd, (error, stdout, stderr) => {
+        if (error) {
+            console.error(stderr);
+            return res
+                .status(500)
+                .json({ error: "Failed to fetch info", detail: stderr });
+        }
 
-    // 3. Collect audio buffer
-    const audioChunks = [];
-    for await (const chunk of stream) {
-        audioChunks.push(chunk);
-    }
-    const audioBuffer = Buffer.concat(audioChunks);
+        try {
+            const info = JSON.parse(stdout);
 
-    // 4. Get cover image buffer
-    const coverResponse = await axios.get(thumbnail, {
-        responseType: "arraybuffer"
+            res.json({
+                title: info.title,
+                uploader: info.uploader,
+                duration: info.duration,
+                thumbnail: info.thumbnail,
+                audio_formats: info.formats
+                    .filter(f => f.asr && f.ext === "m4a")
+                    .map(f => ({
+                        quality: f.abr,
+                        format: f.format,
+                        ext: f.ext,
+                        url: f.url
+                    }))
+            });
+        } catch (err) {
+            res.status(500).json({
+                error: "JSON parse error",
+                detail: err.message
+            });
+        }
     });
-    const coverBuffer = Buffer.from(coverResponse.data);
-
-    const audioType = await fileTypeFromBuffer(audioBuffer);
-    const coverType = await fileTypeFromBuffer(coverBuffer);
-    
-    
-    console.log(audioType);
-    console.log(coverType);
-    console.log(title);
-};
-
-download(
-    convertMobileToDesktopYouTubeUrl(
-        "https://m.youtube.com/watch?v=mYUfLYmwJNg&pp =ygULQmx1ZSBidWNrZXQ%3D"
-    )
-);
-
-app.use(cors());
-app.listen(3000, () => {
-    console.log("running...");
 });
+
+// download("http://localhost:3000/video?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+
+app.listen(port, () => console.log("app started"));
