@@ -1,18 +1,19 @@
-FROM node:20
+FROM node:20-slim
 
-# Install Python, pip, ffmpeg, and yt-dlp
+# Install Python, pip, ffmpeg, yt-dlp safely
 RUN apt-get update && \
-apt-get install -y python3 python3-pip ffmpeg && \
-pip install yt-dlp
+    apt-get install -y python3 python3-pip ffmpeg curl && \
+    python3 -m pip install --break-system-packages --no-cache-dir yt-dlp && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
 # Copy package files and install dependencies
 COPY package*.json ./
-RUN npm install
+RUN npm install --omit=dev
 
-# Copy the rest of the app
+# Copy app source
 COPY . .
 
 # Expose port

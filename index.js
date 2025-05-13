@@ -48,6 +48,6 @@ app.get("/info", async (req, res) => {
     });
 });
 
-// download("http://localhost:3000/video?url=https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+// https://www.youtube.com/watch?v=dQw4w9WgXcQ
 
 app.listen(port, () => console.log("app started"));
