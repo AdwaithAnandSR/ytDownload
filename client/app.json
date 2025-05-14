@@ -1,0 +1,51 @@
+{
+    "expo": {
+        "name": "ytDownload",
+        "slug": "ytDownload",
+        "version": "1.0.0",
+        "orientation": "portrait",
+        "icon": "./src/assets/images/icon.png",
+        "scheme": "ytdownload",
+        "userInterfaceStyle": "automatic",
+        "newArchEnabled": true,
+        "ios": {
+            "supportsTablet": true,
+            "bundleIdentifier": "com.anonymous.ytDownload"
+        },
+        "android": {
+            "adaptiveIcon": {
+                "foregroundImage": "./src/assets/images/icon.png",
+                "backgroundColor": "#000000"
+            },
+            "edgeToEdgeEnabled": true,
+            "package": "com.anonymous.ytDownload"
+        },
+        "web": {
+            "bundler": "metro",
+            "output": "static",
+            "favicon": "./src/assets/images/icon.png"
+        },
+        "plugins": [
+            "expo-router",
+            [
+                "expo-splash-screen",
+                {
+                    "image": "./src/assets/images/icon.png",
+                    "imageWidth": 200,
+                    "resizeMode": "contain",
+                    "backgroundColor": "#000000"
+                }
+            ]
+        ],
+        "experiments": {
+            "typedRoutes": true
+        },
+        "extra": {
+            "adminApi": "https://ytdownloadserver-v2ru.onrender.com",
+            "router": {},
+            "eas": {
+                "projectId": "136f6909-21a0-4390-95bb-4e1f4061c0da"
+            }
+        }
+    }
+}

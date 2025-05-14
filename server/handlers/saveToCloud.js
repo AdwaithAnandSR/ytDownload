@@ -17,6 +17,11 @@ const saveToCloud = async (req, res) => {
     try {
         let { data, thumbnail, title } = req.body;
 
+        const exists = await musicModel.findOne({ title });
+
+        if (exists)
+            return res.status(400).json({ error: "Song Already Exists!" });
+
         const [audioRes, thumbnailRes] = await Promise.all([
             axios.get(data.url, { responseType: "arraybuffer" }),
             axios.get(thumbnail, { responseType: "arraybuffer" })
@@ -67,8 +72,7 @@ const saveToCloud = async (req, res) => {
         console.log(error);
         res.json({
             message: `upload failed: ${title}`,
-            error,
-            
+            error
         });
     }
 };

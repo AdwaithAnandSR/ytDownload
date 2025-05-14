@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: yt-dlp-api
-    env: docker
-    dockerfilePath: Dockerfile
-    plan: free
-    autoDeploy: true
