@@ -1,11 +1,12 @@
-import { exec } from "child_process"
-import sanitizeUrl from "../utils/sanitizeUrl.js"
+import { exec } from "child_process";
+import sanitizeUrl from "../utils/sanitizeUrl.js";
+import sortFormates from "../utils/sortFormates.js";
 
 const handleGetInfo = async (req, res) => {
     let { url } = req.body;
 
     url = sanitizeUrl(url);
-    
+
     console.log(url);
 
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
@@ -23,20 +24,15 @@ const handleGetInfo = async (req, res) => {
         try {
             const info = JSON.parse(stdout);
 
+            const { audioQuality, videoQuality } = sortFormates(info.formats);
+
             res.json({
                 title: info.title,
                 uploader: info.uploader,
                 duration: info.duration,
                 thumbnail: info.thumbnail,
-                formats: info.formats,
-                audio_formats: info.formats
-                    .filter(f => f.asr && f.ext === "m4a")
-                    .map(f => ({
-                        quality: f.abr,
-                        format: f.format,
-                        ext: f.ext,
-                        url: f.url
-                    }))
+                audioQuality,
+                videoQuality
             });
         } catch (err) {
             res.status(500).json({
@@ -47,4 +43,4 @@ const handleGetInfo = async (req, res) => {
     });
 };
 
-export default handleGetInfo
+export default handleGetInfo;
