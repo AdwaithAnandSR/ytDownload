@@ -60,14 +60,15 @@ const saveToCloud = async (req, res) => {
         console.log(result);
 
         return res.json({
-            message: "upload successfull.",
+            message: `upload successfull: ${title}`,
             title
         });
     } catch (error) {
         console.log(error);
         res.json({
-            message: "upload failed.",
-            error
+            message: `upload failed: ${title}`,
+            error,
+            
         });
     }
 };
