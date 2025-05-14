@@ -18,7 +18,7 @@ const saveToCloud = async (req, res) => {
         let { data, thumbnail, title } = req.body;
 
         const [audioRes, thumbnailRes] = await Promise.all([
-            axios.get(data[0].url, { responseType: "arraybuffer" }),
+            axios.get(data.url, { responseType: "arraybuffer" }),
             axios.get(thumbnail, { responseType: "arraybuffer" })
         ]);
 
