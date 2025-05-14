@@ -16,7 +16,7 @@ app.use(cors());
 
 app.post("/setCookie", handleSetCookie);
 
-app.post("/saveToCloud", (req, res) => {
+app.post("/saveToCloud",async (req, res) => {
     let { data , thumbnail} = req.body;
     
     console.log(data[0]);
