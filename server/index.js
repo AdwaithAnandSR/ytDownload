@@ -1,15 +1,16 @@
-import  express from "express"
-import  cors from "cors"
-import  fs from "fs"
-import { exec } from "child_process"
+import express from "express";
+import cors from "cors";
+import fs from "fs";
+import { exec } from "child_process";
 
 const port = 3000;
 const app = express();
 
-import handleGetInfo from "./handlers/getInfo.js"
+import handleGetInfo from "./handlers/getInfo.js";
+import sanitize from "./utils/sanitizeUrl.js";
 
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 function convertToNetscapeCookies(cookieString, domain = ".youtube.com") {
     const cookies = cookieString.split("; ").map(cookie => {
@@ -39,12 +40,12 @@ const newCookie = convertToNetscapeCookies(
 
 fs.writeFileSync("cookies.txt", newCookie);
 
-
-
-app.post("/info", handleGetInfo);
+app.post("/getInfo", handleGetInfo);
 
 app.get("/info", async (req, res) => {
-    const { url } = req.query;
+    let { url } = req.query;
+
+    url = sanitize(url);
 
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 

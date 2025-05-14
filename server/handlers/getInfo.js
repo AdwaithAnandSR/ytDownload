@@ -10,7 +10,7 @@ const handleGetInfo = async (req, res) => {
 
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 
-    const cmd = `yt-dlp --cookies cookies.txt -j "${url}"`;
+    const cmd = `yt-dlp --cookies ../cookies.txt -j "${url}"`;
 
     exec(cmd, (error, stdout, stderr) => {
         if (error) {
