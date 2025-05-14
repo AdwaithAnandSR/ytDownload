@@ -1,5 +1,6 @@
 import express from "express";
 import cors from "cors";
+import axios from "axios";
 import { exec } from "child_process";
 
 const port = 3000;
@@ -19,7 +20,8 @@ app.post("/setCookie", handleSetCookie);
 app.post("/saveToCloud",async (req, res) => {
     let { data , thumbnail} = req.body;
     
-    console.log(data[0]);
+    console.log(data[0].url);
+    console.log(thumbnail);
 
     const [audioRes, thumbnailRes] = await Promise.all([
         axios.get(data[0].url, { responseType: "arraybuffer" }),
