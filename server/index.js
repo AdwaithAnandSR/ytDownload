@@ -17,13 +17,13 @@ app.use(cors());
 app.post("/setCookie", handleSetCookie);
 
 app.post("/saveToCloud", (req, res) => {
-    let { data } = req.body;
+    let { data , thumbnail} = req.body;
     
-    console.log(data, data[0]);
+    console.log(data[0]);
 
     const [audioRes, thumbnailRes] = await Promise.all([
-        axios.get(data.url, { responseType: "arraybuffer" }),
-        axios.get(data.thumbnail, { responseType: "arraybuffer" })
+        axios.get(data[0].url, { responseType: "arraybuffer" }),
+        axios.get(thumbnail, { responseType: "arraybuffer" })
     ]);
 
     const audioBuffer = Buffer.from(audioRes.data);
