@@ -5,6 +5,8 @@ const handleGetInfo = async (req, res) => {
     let { url } = req.body;
 
     url = sanitizeUrl(url);
+    
+    console.log(url);
 
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 
