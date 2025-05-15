@@ -1,5 +1,6 @@
 import axios from "axios";
 import Constants from "expo-constants";
+import Toast from "react-native-toast-message";
 
 const api = Constants.expoConfig.extra.adminApi;
 
@@ -28,7 +29,14 @@ const saveToCloud = async (
             )
         );
     } catch (error) {
-        setInfo({ error });
+        console.log(error);
+        Toast.show({
+            type: "error",
+            text1: JSON.stringify(error?.message || error),
+            text2: JSON.stringify(
+                error?.response?.data?.title || error?.response?.data?.message
+            )
+        });
     }
 };
 

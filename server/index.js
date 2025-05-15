@@ -40,7 +40,7 @@ app.post("/getInfo", (req, res) => {
             const exists = await musicModel.findOne({ title: info.title });
 
             if (exists)
-                return res.status(400).json({ error: "Song Already Exists!" });
+                return res.status(400).json({ error: `Song Already Exists: ${info.title}` });
 
             res.json({
                 title: info.title,

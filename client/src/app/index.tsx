@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useCallback } from "react";
 import {
     View,
     Text,
@@ -6,6 +6,7 @@ import {
     StyleSheet,
     BackHandler
 } from "react-native";
+import { useFocusEffect } from "@react-navigation/native";
 import { WebView } from "react-native-webview";
 import { router } from "expo-router";
 
@@ -26,22 +27,24 @@ export default function App() {
 
     useGetInfo({ url: currentUrl });
 
-    useEffect(() => {
-        const backAction = () => {
-            if (canGoBack) {
-                webviewRef.current.goBack();
-                return true; // prevent default behavior (exit app)
-            }
-            return false; // allow default behavior (exit app)
-        };
+    useFocusEffect(
+        useCallback(() => {
+            const backAction = () => {
+                if (canGoBack) {
+                    webviewRef.current.goBack();
+                    return true;
+                }
+                return false;
+            };
 
-        const backHandler = BackHandler.addEventListener(
-            "hardwareBackPress",
-            backAction
-        );
+            const backHandler = BackHandler.addEventListener(
+                "hardwareBackPress",
+                backAction
+            );
 
-        return () => backHandler.remove();
-    }, [canGoBack]);
+            return () => backHandler.remove();
+        }, [canGoBack])
+    );
 
     const handleGetUrl = () => {
         if (webviewRef.current) {

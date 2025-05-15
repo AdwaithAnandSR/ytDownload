@@ -99,8 +99,9 @@ const DownloadDetailsStripe = ({ setIsStripeVisible }) => {
             </Animated.View>
 
             {/* stripe body */}
+
             <ScrollView style={styles.scrollView}>
-                {downloadQueue.map((item, index) => (
+                {downloadQueue?.map((item, index) => (
                     <StripeBody item={item} key={index} />
                 ))}
             </ScrollView>
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
         height: vh * 0.6,
         position: "absolute",
         bottom: 0,
-        backgroundColor: "black",
+        backgroundColor: "#101010eb",
         borderTopRightRadius: vw * 0.1,
         borderTopLeftRadius: vw * 0.1,
         overflow: "hidden"
@@ -127,13 +128,16 @@ const styles = StyleSheet.create({
     },
     backBtn: {
         width: "20%",
-        height: "20%",
+        height: "10%",
         borderRadius: vw * 0.1,
         backgroundColor: "white"
     },
-    scrollView: {
-        paddingTop: vh * 0.03,
-        paddingBottom: vh * 0.1
+
+    text: {
+        color: "white",
+        textAlign: "center",
+        marginVertical: vh * 0.02,
+        fontWeight: "bold"
     }
 });
 

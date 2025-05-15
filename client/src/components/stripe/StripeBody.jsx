@@ -7,6 +7,7 @@ import {
     Dimensions,
     TouchableOpacity
 } from "react-native";
+import Entypo from "@expo/vector-icons/Entypo";
 
 import VideoQuality from "./VideoQuality.jsx";
 import AudioQuality from "./AudioQuality.jsx";
@@ -19,18 +20,7 @@ const { width: vw, height: vh } = Dimensions.get("window");
 const StripeBody = ({ item: info }) => {
     const { setUploadQueue, setDownloadQueue } = useAppState();
 
-    if (info.error)
-        return (
-            <View style={styles.container}>
-                <Text style={styles.text}>
-                    {info?.error?.response?.data?.detail
-                        ? String(info.error.response.data.detail)
-                        : String(info?.error?.response?.data?.error)
-                        ? String(info?.error?.response?.data?.error)
-                        : String(info.error)}
-                </Text>
-            </View>
-        );
+    if (!info) return;
 
     const handleClick = quality => {
         let data;
@@ -61,6 +51,17 @@ const StripeBody = ({ item: info }) => {
                 <AudioQuality handleClick={handleClick} info={info} />
                 {/*<VideoQuality info={info} />*/}
             </View>
+            <TouchableOpacity
+                onPress={() =>
+                    setDownloadQueue(prev =>
+                        prev.filter(item => item.title != info.title)
+                    )
+                }
+                style={styles.cancelBtn}
+            >
+                <Entypo name="cross" size={18} color="#f8064a" />
+                <Text style={styles.buttonText}>CANCEL</Text>
+            </TouchableOpacity>
         </View>
     );
 };
@@ -70,18 +71,20 @@ const styles = StyleSheet.create({
         flex: 1,
         marginTop: vh * 0.01,
         alignItems: "center",
-        paddingHorizontal: vw * 0.02
+        paddingHorizontal: vw * 0.02,
+        paddingVertical: vh * 0.03,
+        
     },
     wrapper1: {
         flexDirection: "row",
         alignItems: "center",
         gap: vw * 0.03,
-        height: "20%",
+        height: "25%",
         width: "100%"
     },
     imgContainer: {
-        width: vw * 0.18,
-        height: vw * 0.18,
+        width: vw * 0.16,
+        height: vw * 0.16,
         borderRadius: vw * 0.05,
         overflow: "hidden",
         backgroundColor: "#232323"
@@ -98,18 +101,16 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "center"
     },
-    button: {
-        width: "85%",
-        height: vh * 0.07,
-        borderRadius: vw * 0.05,
-        backgroundColor: "#06f946",
+    cancelBtn: {
+        flexDirection: "row",
         justifyContent: "center",
         alignItems: "center",
-        marginTop: vh * 0.05
+        gap: vw * 0.01,
+        marginTop: vh * 0.02,
     },
     buttonText: {
-        color: "white",
-        fontSize: vw * 0.06,
+        color: "#f8064a",
+        fontSize: vw * 0.035,
         fontWeight: "bold"
     },
     text: {
