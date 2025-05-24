@@ -1,26 +1,25 @@
 FROM node:20-slim
 
-# Install Python, pip, ffmpeg, yt-dlp safely
+# Install Python3, pip, ffmpeg, curl
 RUN apt-get update && \
     apt-get install -y python3 python3-pip ffmpeg curl && \
-    python3 -m pip install --break-system-packages --no-cache-dir yt-dlp && \
+    python3 -m pip install --upgrade pip && \
+    python3 -m pip install --no-cache-dir yt-dlp && \
     apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
-# Set working directory
 WORKDIR /app
 
-# Copy package files and install dependencies
-# Add your YouTube cookies
+# Copy YouTube cookies for authenticated downloads
 COPY cookies.txt ./cookies.txt
+
+# Copy package files and install dependencies (prod only)
 COPY package*.json ./
 RUN npm install --omit=dev
 
-# Copy app source
+# Copy app source code
 COPY . .
 
-# Expose port
 EXPOSE 3000
 
-# Run the app
-CMD ["node", "index.js"]
+# Optional: update yt-dlp on container start, then run app
+CMD python3 -m pip install --upgrade yt-dlp && node index.js
