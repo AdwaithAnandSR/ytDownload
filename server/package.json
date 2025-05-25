@@ -27,8 +27,11 @@
     "express": "^5.1.0",
     "file-type": "^20.5.0",
     "firebase-admin": "^13.4.0",
+    "fs": "^0.0.1-security",
     "mongoose": "^8.14.3",
     "node-yt-dl": "^2.2.5",
+    "openai": "^4.103.0",
+    "stream": "^0.0.3",
     "uuid": "^11.1.0"
   }
 }
