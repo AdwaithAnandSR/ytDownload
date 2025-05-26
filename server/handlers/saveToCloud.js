@@ -62,12 +62,12 @@ const saveToCloud = async (req, res) => {
         });
 
         // add to mongodb
-        const response = await axios.post(
+        const saveRes = await axios.post(
             "https://vivid-music.vercel.app/addSong",
             { title, songURL, coverURL }
         );
 
-        console.log(response.status);
+        console.log(saveRes.status);
 
         console.log("saved successfully: ", title);
 
