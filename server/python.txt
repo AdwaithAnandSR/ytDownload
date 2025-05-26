@@ -1,0 +1,58 @@
+!pip install -q git+https://github.com/openai/whisper.git
+!sudo apt-get -y install ffmpeg
+
+import whisper
+import requests
+import tempfile
+import os
+
+# Load model
+model = whisper.load_model("large")
+
+# Firebase audio URL
+audio_url = "https://storage.googleapis.com/vividmusic-d6d28.appspot.com/songs/07536f7d-9a7a-4650-b2ab-303e44da8b3b_primary%253AMusic%252FTelegram%252F7clouds%2520-%2520Justin%2520Bieber%2520%2520Despacito%2520Lyrics%2520%2520Letra%2520f.mp3?..."
+
+# Step 1: Download audio file
+response = requests.get(audio_url)
+temp_mp3 = tempfile.NamedTemporaryFile(delete=False, suffix=".mp3")
+temp_mp3.write(response.content)
+temp_mp3.close()
+
+# Step 2: Convert to WAV
+temp_wav = tempfile.NamedTemporaryFile(delete=False, suffix=".wav")
+os.system(f"ffmpeg -y -i {temp_mp3.name} -ar 16000 -ac 1 -c:a pcm_s16le {temp_wav.name}")
+print("converted to WAV")
+
+# Step 3: Transcribe (auto-detect language)
+result = model.transcribe(temp_wav.name, verbose=True)
+
+# Step 4: Print results
+for segment in result['segments']:
+    start = segment['start']
+    end = segment['end']
+    text = segment['text'].strip()
+    print(f"[{start:.2f}s - {end:.2f}s] {text}")
+
+# Clean up
+os.remove(temp_mp3.name)
+os.remove(temp_wav.name)
+
+
+
+import requests
+
+# Example API URL
+url = "https://api.github.com/users/openai"
+
+# Make GET request
+response = requests.get(url)
+
+# Check response status
+if response.status_code == 200:
+    data = response.json()
+    print("User Info:")
+    print("Login:", data['login'])
+    print("ID:", data['id'])
+    print("Public repos:", data['public_repos'])
+else:
+    print("Failed to fetch data:", response.status_code)

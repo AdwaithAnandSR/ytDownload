@@ -1,5 +1,4 @@
 import axios from "axios";
-import musicModel from "../models/music.js";
 import admin from "firebase-admin";
 import { v4 as uuidv4 } from "uuid";
 import { fileTypeFromBuffer } from "file-type";
@@ -17,15 +16,18 @@ const saveToCloud = async (req, res) => {
     try {
         let { data, thumbnail, title } = req.body;
 
-        const exists = await musicModel.findOne({ title });
+        const response = await axios.post(
+            "https://vivid-music.vercel.app/findSong",
+            { title }
+        );
 
-        if (exists)
-            return res
-                .status(400)
-                .json({
-                    error: "Song Already Exists!",
-                    message: `Song Already Exists: ${title}`
-                });
+        console.log("isExists: ", response?.data?.isExist);
+
+        if (response?.data?.isExist)
+            return res.status(400).json({
+                error: "Song Already Exists!",
+                message: `Song Already Exists: ${title}`
+            });
 
         const [audioRes, thumbnailRes] = await Promise.all([
             axios.get(data.url, { responseType: "arraybuffer" }),
@@ -60,12 +62,12 @@ const saveToCloud = async (req, res) => {
         });
 
         // add to mongodb
+        const response = await axios.post(
+            "https://vivid-music.vercel.app/addSong",
+            { title, songURL, coverURL }
+        );
 
-        const result = await musicModel.create({
-            cover: coverURL || null,
-            url: songURL,
-            title
-        });
+        console.log(response.status);
 
         console.log("saved successfully: ", title);
 

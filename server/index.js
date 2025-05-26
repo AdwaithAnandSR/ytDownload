@@ -11,11 +11,6 @@ import saveToCloud from "./handlers/saveToCloud.js";
 import sanitizeUrl from "./utils/sanitizeUrl.js";
 import sortFormates from "./utils/sortFormates.js";
 
-import lyrics from "./lyrics.js";
-
-import mongoose from "./config/mongoose.config.js";
-import musicModel from "./models/music.js";
-
 app.use(express.json());
 app.use(cors());
 
