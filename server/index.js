@@ -34,10 +34,17 @@ app.post("/getInfo", (req, res) => {
             const info = JSON.parse(stdout);
             const { audioQuality, videoQuality } = sortFormates(info.formats);
 
-            const exists = await musicModel.findOne({ title: info.title });
+         
+             const response = await axios.post(
+            "https://vivid-music.vercel.app/findSong",
+            { title }
+        );
 
-            if (exists)
-                return res.status(400).json({ error: `Song Already Exists: ${info.title}` });
+        console.log("isExists: ", response?.data?.isExist);
+
+        if (response?.data?.isExist)
+            return res.status(400).json({ error: `Song Already Exists: ${info.title}` });
+
 
             res.json({
                 title: info.title,
