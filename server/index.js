@@ -37,7 +37,7 @@ app.post("/getInfo", (req, res) => {
          
              const response = await axios.post(
             "https://vivid-music.vercel.app/findSong",
-            { title }
+            { title: info.title }
         );
 
         console.log("isExists: ", response?.data?.isExist);
