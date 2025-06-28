@@ -1,9 +1,6 @@
-import fs from "fs";
-import tmp from "tmp";
-import dotenv from "dotenv";
 import axios from "axios";
 import { spawn } from "child_process";
-dotenv.config();
+
 
 import sanitizeUrl from "../utils/sanitizeUrl.js";
 
