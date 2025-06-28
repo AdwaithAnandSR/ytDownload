@@ -12,13 +12,7 @@ const getFileInfo = async (req, res) => {
 
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
-    if (!cookieContent) {
-        console.error("No cookie found in .env (YTDLP_COOKIES)");
-        return res.status(401).json({
-            success: false,
-            message: "No cookie found in .env (YTDLP_COOKIES)"
-        });
-    }
+    
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
         "--dump-json",
