@@ -12,10 +12,6 @@ const getFileInfo = async (req, res) => {
 
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
-
-    const base64 = process.env.YTDL_COOKIES_BASE64;
-    let cookieContent = Buffer.from(base64, "base64").toString("utf-8");
-
     if (!cookieContent) {
         console.error("No cookie found in .env (YTDLP_COOKIES)");
         return res.status(401).json({
@@ -23,17 +19,12 @@ const getFileInfo = async (req, res) => {
             message: "No cookie found in .env (YTDLP_COOKIES)"
         });
     }
-
-    cookieContent = cookieContent.replace(/\\n/g, "\n");
-    const tmpFile = tmp.fileSync({ postfix: ".txt" });
-    fs.writeFileSync(tmpFile.name, cookieContent);
-
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
         "--dump-json",
         "--no-warnings",
         "--cookies",
-        tmpFile.name,
+        "../cookies.txt",
         url
     ]);
 
@@ -77,12 +68,10 @@ const getFileInfo = async (req, res) => {
                 );
 
                 if (isExistsRes.data.exists) {
-                    return res
-                        .status(410)
-                        .json({
-                            message: "song already exists ",
-                            title: output.title
-                        });
+                    return res.status(410).json({
+                        message: "song already exists ",
+                        title: output.title
+                    });
                 }
 
                 console.log(output.title);
