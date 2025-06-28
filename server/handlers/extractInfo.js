@@ -12,13 +12,14 @@ const getFileInfo = async (req, res) => {
 
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
-    
+
+    console.log("get info: ", url);
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
         "--dump-json",
         "--no-warnings",
         "--cookies",
-        "../cookies.txt",
+        "./cookies.txt",
         url
     ]);
 
