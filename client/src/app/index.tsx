@@ -1,90 +1,29 @@
-import React, { useRef, useState, useEffect, useCallback } from "react";
-import {
-    View,
-    Text,
-    TouchableOpacity,
-    StyleSheet,
-    BackHandler
-} from "react-native";
-import { useFocusEffect } from "@react-navigation/native";
-import { WebView } from "react-native-webview";
+import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { router } from "expo-router";
 
-import FloatingBtn from "../components/FloatingDownloadBtn.jsx";
-import BottomStripe from "../components/stripe/StripeContainer.jsx";
-
-import handleDownload from "../controllers/downloadViaUrl.js";
-import useGetInfo from "../hooks/useGetInfo.js";
-
-import { useAppState } from "../contexts/state.context.js";
-
 export default function App() {
-    const webviewRef = useRef(null);
-    const [currentUrl, setCurrentUrl] = useState("");
-    const [isStripeVisible, setIsStripeVisible] = useState(false);
-
-    const [canGoBack, setCanGoBack] = useState(false);
-
-    useGetInfo({ url: currentUrl });
-
-    useFocusEffect(
-        useCallback(() => {
-            const backAction = () => {
-                if (canGoBack) {
-                    webviewRef.current.goBack();
-                    return true;
-                }
-                return false;
-            };
-
-            const backHandler = BackHandler.addEventListener(
-                "hardwareBackPress",
-                backAction
-            );
-
-            return () => backHandler.remove();
-        }, [canGoBack])
-    );
-
-    const handleGetUrl = () => {
-        if (webviewRef.current) {
-            webviewRef.current.injectJavaScript(`
-        window.ReactNativeWebView.postMessage(window.location.href);
-        true;
-      `);
-        }
-    };
-
-    const handleMessage = event => {
-        const url = event.nativeEvent.data;
-        setCurrentUrl(url);
-    };
-
-    const handleDownloadBtnClick = () => {
-        setIsStripeVisible(true);
-        handleGetUrl();
-    };
-
     return (
-        <View style={{ flex: 1 }}>
-            <WebView
-                ref={webviewRef}
-                source={{ uri: "https://m.youtube.com" }}
-                onMessage={handleMessage}
-                javaScriptEnabled={true}
-                style={{ flex: 1 }}
-                onNavigationStateChange={navState => {
-                    setCanGoBack(navState.canGoBack);
-                }}
-            />
-
-            <FloatingBtn handlePress={handleDownloadBtnClick} />
-
-            {isStripeVisible && (
-                <BottomStripe setIsStripeVisible={setIsStripeVisible} />
-            )}
+        <View
+            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
+        >
+            <TouchableOpacity
+                onPress={() => router.push("YouTube")}
+                style={styles.button}
+            >
+                <Text>YouTube</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("SyncList")}
+            >
+                <Text>Sync</Text>
+            </TouchableOpacity>
         </View>
     );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+    button: {
+        padding: 20
+    }
+});

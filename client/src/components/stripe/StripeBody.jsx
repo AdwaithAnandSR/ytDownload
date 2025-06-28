@@ -9,7 +9,6 @@ import {
 } from "react-native";
 import Entypo from "@expo/vector-icons/Entypo";
 
-import VideoQuality from "./VideoQuality.jsx";
 import AudioQuality from "./AudioQuality.jsx";
 
 import { useAppState } from "../../contexts/state.context.js";
@@ -20,19 +19,7 @@ const { width: vw, height: vh } = Dimensions.get("window");
 const StripeBody = ({ item: info }) => {
     const { setUploadQueue, setDownloadQueue } = useAppState();
 
-    if (!info) return;
-
-    const handleClick = quality => {
-        let data;
-        if (quality === "high") data = info?.audioQuality?.high[0];
-        else if (quality === "medium") data = info?.audioQuality?.medium[0];
-        else if (quality === "low") data = info?.audioQuality?.low[0];
-
-        handleSaveToCloud(data, info.thumbnail, info.title, setUploadQueue);
-        setDownloadQueue(prev =>
-            prev.filter(item => item.title !== info.title)
-        );
-    };
+    if (!info.title) return;
 
     return (
         <View style={styles.container}>
@@ -48,8 +35,7 @@ const StripeBody = ({ item: info }) => {
                 </Text>
             </View>
             <View style={styles.wrapper2}>
-                <AudioQuality handleClick={handleClick} info={info} />
-                {/*<VideoQuality info={info} />*/}
+                <AudioQuality setUploadQueue={setUploadQueue} setDownloadQueue={setDownloadQueue} info={info} />
             </View>
             <TouchableOpacity
                 onPress={() =>
@@ -72,8 +58,7 @@ const styles = StyleSheet.create({
         marginTop: vh * 0.01,
         alignItems: "center",
         paddingHorizontal: vw * 0.02,
-        paddingVertical: vh * 0.03,
-        
+        paddingVertical: vh * 0.03
     },
     wrapper1: {
         flexDirection: "row",
@@ -106,7 +91,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         gap: vw * 0.01,
-        marginTop: vh * 0.02,
+        marginTop: vh * 0.02
     },
     buttonText: {
         color: "#f8064a",
