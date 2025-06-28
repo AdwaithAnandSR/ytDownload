@@ -13,7 +13,7 @@ import { router } from "expo-router";
 const getSongs = async (page, limit, setData) => {
     try {
         const res = await axios.post(
-            "http://localhost:5000/lyrics/getUnSyncedLyrics",
+            "https://vivid-music.vercel.app/lyrics/getUnSyncedLyrics",
             { page, limit }
         );
         setData(res.data.songs);

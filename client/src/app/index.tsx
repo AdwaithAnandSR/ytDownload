@@ -3,27 +3,50 @@ import { router } from "expo-router";
 
 export default function App() {
     return (
-        <View
-            style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
-        >
+        <View style={styles.container}>
             <TouchableOpacity
                 onPress={() => router.push("YouTube")}
                 style={styles.button}
             >
-                <Text>YouTube</Text>
+                <Text style={styles.text}>Save To Cloud</Text>
             </TouchableOpacity>
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.push("SyncList")}
             >
-                <Text>Sync</Text>
+                <Text style={styles.text}>Sync</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("addLyric/AddLyricToSong")}
+            >
+                <Text style={styles.text}>Add Lyric From Text</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("addLyric/AddLyricToDb")}
+            >
+                <Text style={styles.text}>Add Lyric From DB</Text>
             </TouchableOpacity>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: "black",
+        padding: 10
+    },
     button: {
-        padding: 20
+        padding: 20,
+        backgroundColor: "#19f696",
+        borderRadius: 25,
+        marginVertical: 10
+    },
+    text: {
+        textAlign: "center",
+        fontSize: 20,
+        fontWeight: "bold"
     }
 });

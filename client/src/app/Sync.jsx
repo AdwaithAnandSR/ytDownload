@@ -19,7 +19,7 @@ import Result from "../components/Sync/Result.jsx";
 const getDets = async (id, setData) => {
     try {
         const res = await axios.post(
-            "http://localhost:5000/lyrics/getSongById",
+            "https://vivid-music.vercel.app/lyrics/getSongById",
             { id }
         );
         setData(res.data.song);

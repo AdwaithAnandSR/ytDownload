@@ -4,8 +4,6 @@ import Toast from "react-native-toast-message";
 
 let api = Constants.expoConfig.extra.adminApi;
 
-api = "http://localhost:3000";
-
 const saveToCloud = async ({ coverUrl, songUrl, info, setUploadQueue }) => {
     try {
         setUploadQueue(prev => [

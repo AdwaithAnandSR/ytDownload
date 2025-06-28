@@ -4,8 +4,6 @@ import Toast from "react-native-toast-message";
 
 let api = Constants.expoConfig.extra.adminApi;
 
-api = "http://localhost:3000";
-
 const handleFetchInfo = async url => {
     try {
         Toast.show({
