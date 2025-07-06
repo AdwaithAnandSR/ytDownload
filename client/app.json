@@ -44,6 +44,7 @@
     },
     "extra": {
       "adminApi": "https://ytdownloadserver-v2ru.onrender.com",
+      "api": "https://vivid-music.vercel.app",
       "router": {},
       "eas": {
         "projectId": "136f6909-21a0-4390-95bb-4e1f4061c0da"

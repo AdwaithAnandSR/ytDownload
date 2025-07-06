@@ -11,7 +11,7 @@ import { router } from "expo-router";
 import axios from "axios";
 import Constants from "expo-constants";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 
 const handleSearch = async (page, setData) => {
     try {

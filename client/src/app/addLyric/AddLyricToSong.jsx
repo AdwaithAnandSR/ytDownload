@@ -11,7 +11,7 @@ import {
 import axios from "axios";
 import Constants from "expo-constants";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 
 const handleSearch = async (text, setData) => {
     try {
@@ -25,12 +25,9 @@ const handleSearch = async (text, setData) => {
             );
             setData(res?.data?.songs);
         } else {
-            const res = await axios.post(
-                `${api}/admin/searchSong`,
-                {
-                    text
-                }
-            );
+            const res = await axios.post(`${api}/admin/searchSong`, {
+                text
+            });
             setData(res?.data?.songs);
         }
     } catch (error) {
@@ -41,14 +38,11 @@ const handleSearch = async (text, setData) => {
 const handleAddLyric = async (lyricText, artist, item) => {
     let lyric = lyricText.split("\n").filter(line => line.trim() !== "");
 
-    const res = await axios.post(
-        `${api}/admin/addLyricsDirectToSong`,
-        {
-            lyric,
-            songId: item._id,
-            artist
-        }
-    );
+    const res = await axios.post(`${api}/admin/addLyricsDirectToSong`, {
+        lyric,
+        songId: item._id,
+        artist
+    });
 
     alert(res.data.success);
 };

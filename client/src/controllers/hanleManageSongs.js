@@ -2,7 +2,7 @@ import axios from "axios";
 import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 
 // api = "http://localhost:5000";
 

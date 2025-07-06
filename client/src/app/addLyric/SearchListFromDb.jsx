@@ -12,7 +12,7 @@ import axios from "axios";
 import Toast from "react-native-toast-message";
 import Constants from "expo-constants";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 // api = "http://localhost:5000";
 
 const handleSearch = async (text, setData) => {

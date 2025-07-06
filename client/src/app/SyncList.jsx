@@ -11,7 +11,7 @@ import axios from "axios";
 import { router } from "expo-router";
 import Constants from "expo-constants";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 
 // api = "http://localhost:5000";
 

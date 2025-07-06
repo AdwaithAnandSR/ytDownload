@@ -11,6 +11,7 @@ import {
 import axios from "axios";
 import { router } from "expo-router";
 import Constants from "expo-constants";
+import { Image } from "expo-image";
 
 import {
     deleteSong,
@@ -19,7 +20,9 @@ import {
     updateArtist
 } from "../../controllers/hanleManageSongs.js";
 
-let api = Constants.expoConfig.extra.adminApi;
+import RenderItem from "../../components/manage/RenderItem.jsx";
+
+let api = Constants.expoConfig.extra.api;
 // api = "http://localhost:5000";
 
 const getSongs = async (page, limit, setData) => {
@@ -39,99 +42,6 @@ const getSongs = async (page, limit, setData) => {
     } catch (error) {
         console.error(error);
     }
-};
-
-const RenderItem = ({ item }) => {
-    const [artist, setArtist] = useState(item.artist);
-
-    return (
-        <View style={styles.listItem}>
-            <Text selectable style={styles.title}>
-                {item.title}
-            </Text>
-            <View style={styles.inner}>
-                <View style={styles.left}>
-                    {item?.lyrics?.slice(0, 10).map((item, index) => (
-                        <Text
-                            key={index}
-                            numberOfLines={1}
-                            adjustFontSizeToFit
-                            style={styles.lyric}
-                        >
-                            {item.line}
-                        </Text>
-                    ))}
-                    {item.lyrics?.length > 0 && (
-                        <TouchableOpacity
-                            onLongPress={() => deleteLyric(item._id, 1)}
-                            style={styles.btn}
-                        >
-                            <Text style={styles.title}>DELETE LYRIC</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-                <View style={styles.right}>
-                    {item?.lyricsAsText?.slice(0, 10).map((item, index) => (
-                        <Text
-                            key={index}
-                            numberOfLines={1}
-                            adjustFontSizeToFit
-                            style={styles.lyric}
-                        >
-                            {item}
-                        </Text>
-                    ))}
-                    {item.lyricsAsText?.length > 0 && (
-                        <TouchableOpacity
-                            onLongPress={() => deleteLyric(item._id, 1)}
-                            style={styles.btn}
-                        >
-                            <Text style={styles.title}>DELETE LYRIC</Text>
-                        </TouchableOpacity>
-                    )}
-                </View>
-            </View>
-
-            <Text
-                style={[
-                    styles.title,
-                    { color: item.synced ? "#87f0c2" : "white" }
-                ]}
-            >
-                Is Synced: {item.synced ? "TRUE" : "FALSE"}
-            </Text>
-
-            {item.lyricsAsText?.length > 0 && item.lyrics?.length > 0 && (
-                <TouchableOpacity
-                    onLongPress={() => swapLyric(item._id)}
-                    style={[styles.btn, { backgroundColor: "#723b10" }]}
-                >
-                    <Text style={styles.title}>SWAP LYRIC</Text>
-                </TouchableOpacity>
-            )}
-
-            <View style={styles.artist}>
-                <TextInput
-                    style={styles.input}
-                    value={artist}
-                    onChangeText={txt => setArtist(txt)}
-                />
-                <TouchableOpacity
-                    onLongPress={() => updateArtist(item._id, artist)}
-                    style={[styles.btn, { backgroundColor: "#77e000" }]}
-                >
-                    <Text style={styles.title}>SAVE</Text>
-                </TouchableOpacity>
-            </View>
-
-            <TouchableOpacity
-                onLongPress={() => deleteSong(item._id)}
-                style={styles.btn}
-            >
-                <Text style={styles.title}>DELETE SONG</Text>
-            </TouchableOpacity>
-        </View>
-    );
 };
 
 const ManageSongs = () => {
@@ -154,7 +64,7 @@ const ManageSongs = () => {
                     style={styles.btn}
                     onPress={() => getSongs(page, 10, setData)}
                 >
-                    <Text style={styles.title}>find</Text>
+                    <Text>find</Text>
                 </TouchableOpacity>
             </View>
             <FlatList
@@ -193,57 +103,13 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         marginVertical: 10
     },
-    listItem: {
-        width: "98%",
-        height: 650,
-        marginHorizontal: "auto",
-        marginVertical: 10,
-        borderRadius: 18,
-        borderColor: "white",
-        borderWidth: 1,
-        padding: 15,
-        paddingVetical: 50,
-        overflow: "hidden"
-    },
     title: {
         fontWeight: "bold",
         fontSize: 20,
         textAlign: "center",
         overflow: "hidden",
-        color: "white"
-    },
-    inner: {
-        width: "100%",
-        overflow: "hidden",
-        height: "50%",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingVertical: 15
-    },
-    left: {
-        overflow: "hidden",
-        width: "50%",
-        alignItems: "center",
-        height: "90%"
-    },
-    right: {
-        height: "90%",
-        overflow: "hidden",
-        width: "50%",
-        alignItems: "center"
-    },
-    lyric: {
         color: "white",
-        width: "90%"
-    },
-    artist: {
-        width: "100%",
-        overflow: "hidden",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "center",
-        paddingVertical: 10
+        width: "75%"
     }
 });
 

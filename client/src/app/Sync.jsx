@@ -17,7 +17,7 @@ import RenderItem from "../components/Sync/LyricItem.jsx";
 import Nav from "../components/Sync/Nav.jsx";
 import Result from "../components/Sync/Result.jsx";
 
-let api = Constants.expoConfig.extra.adminApi;
+let api = Constants.expoConfig.extra.api;
 // api = "http://localhost:5000";
 
 const getDets = async (id, setData) => {
