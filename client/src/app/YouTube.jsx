@@ -14,8 +14,6 @@ import { useAudioPlayer } from "expo-audio";
 import FloatingBtn from "../components/FloatingDownloadBtn.jsx";
 import BottomStripe from "../components/stripe/StripeContainer.jsx";
 
-import useGetInfo from "../hooks/useGetInfo.js";
-
 export default function App() {
     const webviewRef = useRef(null);
     const pendingUrlResolver = useRef(null);

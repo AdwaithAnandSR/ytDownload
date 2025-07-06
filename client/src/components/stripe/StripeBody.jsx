@@ -35,7 +35,11 @@ const StripeBody = ({ item: info }) => {
                 </Text>
             </View>
             <View style={styles.wrapper2}>
-                <AudioQuality setUploadQueue={setUploadQueue} setDownloadQueue={setDownloadQueue} info={info} />
+                <AudioQuality
+                    setUploadQueue={setUploadQueue}
+                    setDownloadQueue={setDownloadQueue}
+                    info={info}
+                />
             </View>
             <TouchableOpacity
                 onPress={() =>
@@ -58,7 +62,8 @@ const styles = StyleSheet.create({
         marginTop: vh * 0.01,
         alignItems: "center",
         paddingHorizontal: vw * 0.02,
-        paddingVertical: vh * 0.03
+        paddingVertical: vh * 0.03,
+        paddingBottom: vh * 0.1
     },
     wrapper1: {
         flexDirection: "row",
@@ -82,7 +87,7 @@ const styles = StyleSheet.create({
     },
     wrapper2: {
         width: "100%",
-        marginTop: vh * 0.03,
+        
         flexDirection: "row",
         justifyContent: "center"
     },

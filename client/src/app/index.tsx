@@ -10,23 +10,33 @@ export default function App() {
             >
                 <Text style={styles.text}>Save To Cloud</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.push("SyncList")}
             >
                 <Text style={styles.text}>Sync</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
                 style={styles.button}
                 onPress={() => router.push("addLyric/AddLyricToSong")}
             >
                 <Text style={styles.text}>Add Lyric From Text</Text>
             </TouchableOpacity>
+
             <TouchableOpacity
                 style={styles.button}
-                onPress={() => router.push("addLyric/AddLyricToDb")}
+                onPress={() => router.push("addLyric/AddLyricFromDb")}
             >
                 <Text style={styles.text}>Add Lyric From DB</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+                style={styles.button}
+                onPress={() => router.push("manage/ManageSongs")}
+            >
+                <Text style={styles.text}>Manage Songs</Text>
             </TouchableOpacity>
         </View>
     );

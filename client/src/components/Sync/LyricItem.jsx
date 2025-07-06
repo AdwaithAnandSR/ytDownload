@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 
-const RenderItem = ({ item, index, player, syncedLyricRef }) => {
+const RenderItem = ({ item, index, player, syncedLyricRef, showL2 }) => {
     const setStart = () => {
         syncedLyricRef.current[index].start = player.currentTime;
         console.log(`Set start for line ${index} at ${player.currentTime}`);
@@ -13,13 +13,13 @@ const RenderItem = ({ item, index, player, syncedLyricRef }) => {
 
     return (
         <TouchableOpacity style={styles.listItem}>
-            <Text style={styles.title}>{item}</Text>
+            <Text style={styles.txt}>{showL2 ? item : item?.line}</Text>
             <View style={styles.buttonRow}>
                 <TouchableOpacity onPress={setStart} style={styles.btn}>
-                    <Text>START</Text>
+                    <Text style={styles.txt}>START</Text>
                 </TouchableOpacity>
                 <TouchableOpacity onPress={setEnd} style={styles.btn}>
-                    <Text>END</Text>
+                    <Text style={styles.txt}>END</Text>
                 </TouchableOpacity>
             </View>
         </TouchableOpacity>
@@ -33,17 +33,19 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
         borderColor: "#ccc"
     },
-    title: {
+    txt: {
         fontWeight: "bold",
         fontSize: 18,
         textAlign: "center",
-        marginBottom: 10
+        color: "white"
     },
     btn: {
+        marginTop: 10,
         padding: 10,
         borderWidth: 2,
         borderRadius: 23,
-        marginHorizontal: 5
+        marginHorizontal: 5,
+        borderColor: '#a7a7a7',
     },
     buttonRow: {
         flexDirection: "row",

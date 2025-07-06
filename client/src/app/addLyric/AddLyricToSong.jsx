@@ -9,12 +9,15 @@ import {
     ScrollView
 } from "react-native";
 import axios from "axios";
+import Constants from "expo-constants";
+
+let api = Constants.expoConfig.extra.adminApi;
 
 const handleSearch = async (text, setData) => {
     try {
         if (text.trim() != "" && !isNaN(text.trim())) {
             const res = await axios.post(
-                "https://vivid-music.vercel.app/lyrics/getRemainingSongs",
+                `${api}/admin/getRemainingSongsWithoutLyric`,
                 {
                     limit: 10,
                     page: text
@@ -23,7 +26,7 @@ const handleSearch = async (text, setData) => {
             setData(res?.data?.songs);
         } else {
             const res = await axios.post(
-                "https://vivid-music.vercel.app/searchSong",
+                `${api}/admin/searchSong`,
                 {
                     text
                 }
@@ -39,7 +42,7 @@ const handleAddLyric = async (lyricText, artist, item) => {
     let lyric = lyricText.split("\n").filter(line => line.trim() !== "");
 
     const res = await axios.post(
-        "https://vivid-music.vercel.app/lyrics/addLyricsDirectToSong",
+        `${api}/admin/addLyricsDirectToSong`,
         {
             lyric,
             songId: item._id,

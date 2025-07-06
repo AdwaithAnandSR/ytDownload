@@ -10,18 +10,19 @@ import {
 import { useGlobalSearchParams } from "expo-router";
 import { router } from "expo-router";
 import axios from "axios";
-import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
+import { useAudioPlayer } from "expo-audio";
+import Constants from "expo-constants";
 
 import RenderItem from "../components/Sync/LyricItem.jsx";
 import Nav from "../components/Sync/Nav.jsx";
 import Result from "../components/Sync/Result.jsx";
 
+let api = Constants.expoConfig.extra.adminApi;
+// api = "http://localhost:5000";
+
 const getDets = async (id, setData) => {
     try {
-        const res = await axios.post(
-            "https://vivid-music.vercel.app/lyrics/getSongById",
-            { id }
-        );
+        const res = await axios.post(`${api}/admin/getSongById`, { id });
         setData(res.data.song);
     } catch (error) {
         console.error(error);
@@ -32,6 +33,7 @@ const Sync = () => {
     const { id } = useGlobalSearchParams();
     const [data, setData] = useState({});
     const [showSync, setShowSync] = useState(false);
+    const [showL2, setShowL2] = useState(false);
 
     const syncedLyricRef = useRef([]);
 
@@ -42,32 +44,45 @@ const Sync = () => {
     }, [id]);
 
     useEffect(() => {
-        if (!data?.lyricsAsText1) return;
+        if (!data) return;
 
-        syncedLyricRef.current = data.lyricsAsText1.map(line => ({
-            start: -1,
-            line,
-            end: -1
-        }));
-    }, [data]);
+        if (showL2) {
+            syncedLyricRef.current = data?.lyricsAsText?.map(line => ({
+                start: -1,
+                line,
+                end: -1
+            }));
+        } else {
+            syncedLyricRef.current = data?.lyrics
+        }
+    }, [data, showL2]);
 
     return (
         <View style={styles.container}>
-            <Nav player={player} id={id} syncedLyricRef={syncedLyricRef} setShowSync={setShowSync} />
+            <Nav
+                player={player}
+                id={id}
+                syncedLyricRef={syncedLyricRef}
+                setShowSync={setShowSync}
+                setShowL2={setShowL2}
+            />
 
             <FlatList
-                data={data.lyricsAsText1}
+                data={showL2 ? data.lyricsAsText : data.lyrics}
                 keyExtractor={(item, index) => index.toString()}
                 renderItem={({ item, index }) => (
                     <RenderItem
                         item={item}
+                        showL2={showL2}
                         index={index}
                         player={player}
                         syncedLyricRef={syncedLyricRef}
                     />
                 )}
             />
-            {showSync && <Result syncedLyricRef={syncedLyricRef} />}
+            {showSync && (
+                <Result showL2={showL2} syncedLyricRef={syncedLyricRef} />
+            )}
         </View>
     );
 };
@@ -77,42 +92,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingTop: 40,
         alignItems: "center",
-        backgroundColor: "#fff"
-    },
-    header: {
-        fontSize: 24,
-        fontWeight: "bold",
-        marginBottom: 10
-    },
-    controlRow: {
-        padding: 15,
-        flexDirection: "row",
-        gap: 30,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    listItem: {
-        width: "100%",
-        padding: 15,
-        borderBottomWidth: 1,
-        borderColor: "#ccc"
-    },
-    title: {
-        fontWeight: "bold",
-        fontSize: 18,
-        textAlign: "center",
-        marginBottom: 10
-    },
-    btn: {
-        padding: 10,
-        borderWidth: 2,
-        borderRadius: 23,
-        marginHorizontal: 5
-    },
-    buttonRow: {
-        flexDirection: "row",
-        justifyContent: "space-between",
-        paddingHorizontal: 30
+        backgroundColor: "black"
     }
 });
 

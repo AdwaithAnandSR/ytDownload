@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 
-const RenderItem = ({ item }) => {
+const RenderItem = ({ item, showL2 }) => {
+    
     return (
         <View style={styles.lyrics}>
             <Text numberOfLines={1} style={styles.text}>

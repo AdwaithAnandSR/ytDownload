@@ -9,14 +9,26 @@ import {
 } from "react-native";
 import axios from "axios";
 import { router } from "expo-router";
+import Constants from "expo-constants";
+
+let api = Constants.expoConfig.extra.adminApi;
+
+// api = "http://localhost:5000";
 
 const getSongs = async (page, limit, setData) => {
     try {
-        const res = await axios.post(
-            "https://vivid-music.vercel.app/lyrics/getUnSyncedLyrics",
-            { page, limit }
-        );
-        setData(res.data.songs);
+        if (page != "" && !isNaN(page)) {
+            const res = await axios.post(`${api}/admin/getSongsToBeSynced`, {
+                page,
+                limit
+            });
+            setData(res.data.songs);
+        } else {
+            const res = await axios.post(`${api}/admin/searchSong`, {
+                text: page
+            });
+            setData(res?.data?.songs);
+        }
     } catch (error) {
         console.error(error);
     }
@@ -36,7 +48,7 @@ const RenderItem = ({ item }) => {
 };
 
 const Sync = () => {
-    const [page, setPage] = useState(1);
+    const [page, setPage] = useState("1");
     const [data, setData] = useState([]);
 
     useEffect(() => {
@@ -51,12 +63,16 @@ const Sync = () => {
                     value={page}
                     onChangeText={txt => setPage(txt)}
                 />
-                <TouchableOpacity onPress={() => getSongs(page, 15, setData)}>
+                <TouchableOpacity
+                    style={styles.btn}
+                    onPress={() => getSongs(page, 15, setData)}
+                >
                     <Text style={styles.title}>find</Text>
                 </TouchableOpacity>
             </View>
             <FlatList
                 data={data}
+                contentContainerStyle={{ paddingVertical: 50 }}
                 renderItem={({ item }) => <RenderItem item={item} />}
             />
         </View>
@@ -67,24 +83,43 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+        backgroundColor: "black"
     },
     listItem: {
-        width: "100%",
-        height: 70,
-        paddingHorizontal: 15,
-        justifyContent: "center"
+        width: "95%",
+        marginHorizontal: "auto",
+        marginVertical: 10,
+        borderRadius: 18,
+        borderColor: "white",
+        borderWidth: 1,
+        padding: 15,
+        paddingVetical: 50
     },
     title: {
         fontWeight: "bold",
-        fontSize: 20,
-        textAlign: "center"
+        fontSize: 15,
+        textAlign: "center",
+        color: "white"
     },
     input: {
+        width: "70%",
+        padding: 15,
+        borderRadius: 18,
+        borderColor: "white",
+        color: "white",
+        borderWidth: 1,
+        fontSize: 17,
+        fontWeight: "bold",
+        backgroundColor: "#121212"
+    },
+    btn: {
         padding: 10,
-        borderColor: "black",
-        borderWidth: 2,
-        width: 200
+        paddingHorizontal: 15,
+        borderRadius: 18,
+        backgroundColor: "#eb0b4a",
+        alignItems: "center",
+        justifyContent: "center"
     }
 });
 

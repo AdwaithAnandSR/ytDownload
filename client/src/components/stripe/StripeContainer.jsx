@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
         borderRadius: vw * 0.1,
         backgroundColor: "white"
     },
-
+    
     text: {
         color: "white",
         textAlign: "center",
