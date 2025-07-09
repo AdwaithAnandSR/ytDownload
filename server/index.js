@@ -16,8 +16,7 @@ app.use(cors());
 
 app.post("/setCookie", handleSetCookie);
 app.post("/saveToCloud", saveToCloud);
-app.post("/getInfo",async (req, res)=>{
-    
+app.post("/getInfo", async (req, res) => {
     let { url } = req.body;
 
     url = sanitizeUrl(url);
@@ -30,6 +29,8 @@ app.post("/getInfo",async (req, res)=>{
         "--no-warnings",
         "--cookies",
         "./cookies.txt",
+        "--geo-bypass",
+        "--geo-bypass-country=US",
         url
     ]);
 
@@ -87,8 +88,7 @@ app.post("/getInfo",async (req, res)=>{
                     success: false,
                     message: `Failed to parse JSON`
                 });
-            } 
-            
+            }
         } else {
             console.error(`yt-dlp exited with code ${code}`);
             return res.status(450).json({
@@ -97,8 +97,6 @@ app.post("/getInfo",async (req, res)=>{
             });
         }
     });
-
-
-})
+});
 
 app.listen(port, () => console.log("app started"));
