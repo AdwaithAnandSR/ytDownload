@@ -13,12 +13,13 @@ const getFileInfo = async (req, res) => {
     console.log("get info: ", url);
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
-        "--dump-json",
-        "--no-warnings",
-        "--cookies",
-        "./cookies.txt",
-        url
-    ]);
+  "--verbose",
+  "--dump-json",
+  "--no-warnings",
+  "--cookies", "./cookies.txt",
+  "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+  url
+]);
 
     let json = "";
 
