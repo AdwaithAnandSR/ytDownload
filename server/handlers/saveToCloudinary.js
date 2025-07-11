@@ -4,6 +4,8 @@ import axios from "axios";
 import https from "https";
 import cloudinaryModule from "cloudinary";
 import streamifier from "streamifier";
+import dotenv from "dotenv";
+dotenv.config()
 
 const cloudinary = cloudinaryModule.v2;
 
@@ -92,6 +94,8 @@ const saveToCloud = async (req, res) => {
                 .status(409)
                 .json({ message: "song already exists ", title });
         }
+        
+        console.log('\n\nUoloading...\n')
 
         coverPublicUrl = await uploadImageFromUrl(coverUrl);
         songPublicUrl = await uploadAudioFromUrl(audioUrl);

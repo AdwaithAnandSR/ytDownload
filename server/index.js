@@ -3,7 +3,7 @@ import cors from "cors";
 import axios from "axios";
 import { spawn } from "child_process";
 
-const port = 3000;
+const port = 7000;
 const app = express();
 
 import handleSetCookie from "./handlers/setCookie.js";
