@@ -27,6 +27,8 @@ const handleSetCookie = async (req, res) => {
 
     const newCookie = convertToNetscapeCookies(cookie);
     fs.writeFileSync("cookies.txt", newCookie);
+    
+    res.json({ newCookie })
 };
 
 export default handleSetCookie;

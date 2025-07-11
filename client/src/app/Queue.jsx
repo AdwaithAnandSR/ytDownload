@@ -8,11 +8,23 @@ import {
     Dimensions,
     Image
 } from "react-native";
-import { router } from 'expo-router';
+import { router } from "expo-router";
+import Constants from "expo-constants"
+    import CookieManager from '@react-native-cookies/cookies';
 
 import { useAppState } from "../contexts/state.context.js";
 
 const { width: vw, height: vh } = Dimensions.get("window");
+const api = Constants.expoConfig.extra.adminApi
+
+const handleCookie=()=>{
+
+CookieManager.get('https://youtube.com')
+  .then((cookie) => {
+    console.log('CookieManager.get =>', cookie);
+    const res = axios.post(`${api}/setCookie`, { cookie })
+  });
+}
 
 const QueueItem = ({ item }) => {
     return (
@@ -41,9 +53,20 @@ const Queue = () => {
 
     return (
         <View style={styles.container}>
-            <TouchableOpacity style={styles.backBtn} onPress={() => router.back()}>
-                <Text style={styles.backBtnText}>Back</Text>
-            </TouchableOpacity>
+            <View style={styles.nav}>
+                <TouchableOpacity
+                    style={styles.backBtn}
+                    onPress={() => router.back()}
+                >
+                    <Text style={styles.backBtnText}>Back</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                    style={styles.backBtn}
+                    onPress={() => handleCookie()}
+                >
+                    <Text style={styles.backBtnText}>Get Cookie</Text>
+                </TouchableOpacity>
+            </View>
             <FlatList
                 data={uploadQueue}
                 renderItem={QueueItem}
@@ -62,13 +85,19 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "black"
     },
-    backBtn:{
-        padding: vw * 0.05,
+    nav: {
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "space-between",
+        paddingHorizontal: vw * 0.03
     },
-    backBtnText:{
+    backBtn: {
+        padding: vw * 0.05
+    },
+    backBtnText: {
         color: "white",
         fontSize: vw * 0.05,
-        fontWeight: 'bold',
+        fontWeight: "bold"
     },
     queueItem: {
         width: "100%",
