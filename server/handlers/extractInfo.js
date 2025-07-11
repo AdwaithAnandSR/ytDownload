@@ -4,11 +4,34 @@ import { spawn } from "child_process";
 
 import sanitizeUrl from "../utils/sanitizeUrl.js";
 
+function extractYouTubeID(url) {
+  const match = url.match(
+    /(?:v=|\/shorts\/|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+  );
+  return match ? match[1] : null;
+}
+
 const getFileInfo = async (req, res) => {
     let { url } = req.body;
 
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
+
+
+    const existId = extractYouTubeID(url)
+    if(existId) {
+        const isExistsRes = await axios.post(
+                    "https://vivid-music.vercel.app/checkSongExistsByYtId",
+                    { id: existId }
+                );
+
+                if (isExistsRes.data.exists) {
+                    return res.status(410).json({
+                        message: "song already exists ",
+                        title: output.title
+                    });
+                }
+    }
 
     console.log("get info: ", url);
     // Spawn yt-dlp with cookies
