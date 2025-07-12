@@ -97,11 +97,17 @@ const getFileInfo = async (req, res) => {
                     "https://vivid-music.vercel.app/searchSong",
                     { text: searchText }
                 );
+                
+                console.log(searchResult.data)
 
                 console.log(output.title);
                 return res
                     .status(200)
-                    .json({ success: true, data: output, searchResult: searchResult.data.songs });
+                    .json({
+                        success: true,
+                        data: output,
+                        searchResult: searchResult
+                    });
             } catch (err) {
                 console.error("Failed to parse JSON:", err);
                 return res.status(450).json({
