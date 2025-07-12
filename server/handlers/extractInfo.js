@@ -1,5 +1,8 @@
 import axios from "axios";
 import { spawn } from "child_process";
+import detenv from "dotenv";
+
+dotenv.config()
 
 import sanitizeUrl from "../utils/sanitizeUrl.js";
 
