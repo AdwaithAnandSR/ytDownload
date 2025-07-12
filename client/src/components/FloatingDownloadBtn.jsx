@@ -11,7 +11,7 @@ import Toast from "react-native-toast-message";
 const { width: vw, height: vh } = Dimensions.get("window");
 
 const FloatingDownloadBtn = ({ setIsStripeVisible, handleGetUrl }) => {
-    const { setDownloadQueue, uploadQueue } = useAppState();
+    const { setDownloadQueue, uploadQueue, api } = useAppState();
 
     return (
         <View style={styles.container}>
@@ -28,7 +28,7 @@ const FloatingDownloadBtn = ({ setIsStripeVisible, handleGetUrl }) => {
                 onPress={async () => {
                     const url = await handleGetUrl();
 
-                    const data = await handleGetInfo(url);
+                    const {data, songs} = await handleGetInfo(url, api);
                     if(!data) return
                     setDownloadQueue(prev => {
                         if (
@@ -40,7 +40,7 @@ const FloatingDownloadBtn = ({ setIsStripeVisible, handleGetUrl }) => {
                                 text1: "Loaded to Downloads Queue",
                                 text2: data.title
                             });
-                            return [data, ...prev];
+                            return [{...data, searchResult: songs}, ...prev];
                         }
                         return prev;
                     });

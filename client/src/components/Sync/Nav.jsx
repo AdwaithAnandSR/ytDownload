@@ -70,7 +70,9 @@ const Nav = ({ player, syncedLyricRef, setShowSync, id, setShowL2 }) => {
         <>
             <View style={styles.controlRow}>
                 <View style={styles.left}>
-                    <TouchableOpacity onLongPress={() => setShowL2(prev => !prev)}>
+                    <TouchableOpacity
+                        onLongPress={() => setShowL2(prev => !prev)}
+                    >
                         <Text style={styles.text}>toggle</Text>
                     </TouchableOpacity>
                     <TouchableOpacity

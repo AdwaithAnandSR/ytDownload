@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 import {
     View,
     Text,
@@ -6,25 +6,33 @@ import {
     FlatList,
     TouchableOpacity,
     Dimensions,
-    Image
+    Image,
+    TextInput
 } from "react-native";
 import { router } from "expo-router";
-import Constants from "expo-constants"
-    import CookieManager from '@react-native-cookies/cookies';
+import CookieManager from "@react-native-cookies/cookies";
+import axios from "axios";
+import Toast from "react-native-toast-message";
 
 import { useAppState } from "../contexts/state.context.js";
 
 const { width: vw, height: vh } = Dimensions.get("window");
-const api = Constants.expoConfig.extra.adminApi
 
-const handleCookie=()=>{
-
-CookieManager.get('https://youtube.com')
-  .then((cookie) => {
-    console.log('CookieManager.get =>', cookie);
-    const res = axios.post(`${api}/setCookie`, { cookie })
-  });
-}
+const handleCookie = api => {
+    CookieManager.get("https://youtube.com").then(async cookie => {
+        const res = await axios.post(`${api}/setCookie`, { cookie });
+        if (res.data.success)
+            Toast.show({
+                type: "success",
+                text1: "Cookie Added"
+            });
+        else
+            Toast.show({
+                type: "error",
+                text1: "Cookie Adding Failed"
+            });
+    });
+};
 
 const QueueItem = ({ item }) => {
     return (
@@ -49,7 +57,8 @@ const QueueItem = ({ item }) => {
 };
 
 const Queue = () => {
-    const { uploadQueue } = useAppState();
+    const { uploadQueue, api, setApi } = useAppState();
+    const [apiVal, setApiVal] = useState(api || "");
 
     return (
         <View style={styles.container}>
@@ -60,9 +69,22 @@ const Queue = () => {
                 >
                     <Text style={styles.backBtnText}>Back</Text>
                 </TouchableOpacity>
+
+                <TextInput
+                    style={{
+                        width: 200,
+                        height: 50,
+                        backgroundColor: "#181717",
+                        color: "white",
+                        borderRadius: 23,
+                    }}
+                    value={api}
+                    onChangeText={txt => setApi(txt)}
+                />
+
                 <TouchableOpacity
                     style={styles.backBtn}
-                    onPress={() => handleCookie()}
+                    onPress={() => handleCookie(api)}
                 >
                     <Text style={styles.backBtnText}>Get Cookie</Text>
                 </TouchableOpacity>

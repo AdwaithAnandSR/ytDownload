@@ -1,13 +1,27 @@
 import axios from "axios";
-import Constants from "expo-constants";
 import Toast from "react-native-toast-message";
+// import Constants from "expo-constants";
 
-let api = Constants.expoConfig.extra.adminApi;
+// let api = Constants.expoConfig.extra.adminApi;
+// // api = "http://localhost:7000";
+// api =
+//     "https://0b03a10c-a786-425b-b9b5-6bfe917653dc-00-3ahkqrhxdms07.pike.replit.dev";
 
-const saveToCloud = async ({ coverUrl, songUrl, info, setUploadQueue }) => {
+const saveToCloud = async ({
+    coverUrl,
+    api,
+    songUrl,
+    info,
+    setUploadQueue
+}) => {
     try {
         setUploadQueue(prev => [
-            { title: info.title, isUploaded: false, thumbnail: coverUrl, isFailed: false },
+            {
+                title: info.title,
+                isUploaded: false,
+                thumbnail: coverUrl,
+                isFailed: false
+            },
             ...prev
         ]);
 

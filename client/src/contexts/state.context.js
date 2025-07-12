@@ -1,4 +1,7 @@
 import { useState, useEffect, createContext, useContext } from "react";
+import Constants from "expo-constants";
+
+let serverApi = Constants.expoConfig.extra.adminApi;
 
 const StateContext = createContext();
 
@@ -6,6 +9,7 @@ export const StateProvider = ({ children }) => {
     const [info, setInfo] = useState({});
     const [downloadQueue, setDownloadQueue] = useState([]);
     const [uploadQueue, setUploadQueue] = useState([]);
+    const [api, setApi] = useState(serverApi || '');
 
     return (
         <StateContext.Provider
@@ -15,7 +19,9 @@ export const StateProvider = ({ children }) => {
                 downloadQueue,
                 setDownloadQueue,
                 uploadQueue,
-                setUploadQueue
+                setUploadQueue,
+                api,
+                setApi
             }}
         >
             {children}

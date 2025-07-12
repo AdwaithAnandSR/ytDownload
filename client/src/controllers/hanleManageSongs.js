@@ -4,7 +4,7 @@ import Toast from "react-native-toast-message";
 
 let api = Constants.expoConfig.extra.api;
 
-// api = "http://localhost:5000";
+api = "http://localhost:5000";
 
 export const deleteSong = async id => {
     try {

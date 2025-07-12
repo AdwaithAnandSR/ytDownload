@@ -6,6 +6,7 @@ import {
     Dimensions
 } from "react-native";
 import axios from "axios";
+import { useAppState } from "../../contexts/state.context.js"
 
 const { width: vw, height: vh } = Dimensions.get("window");
 
@@ -13,6 +14,7 @@ import handleSaveToCloud from "../../controllers/handlesSaveToCloud.js";
 
 const AudioQuality = ({ info, setDownloadQueue, setUploadQueue }) => {
     if (!info.title) return;
+    const { api } = useAppState()
 
     return (
         <View style={styles.audioQualityContainer}>
@@ -38,7 +40,8 @@ const AudioQuality = ({ info, setDownloadQueue, setUploadQueue }) => {
                                     coverUrl: info?.thumbnail,
                                     songUrl: item.url,
                                     info: info,
-                                    setUploadQueue
+                                    setUploadQueue,
+                                    api
                                 });
                                 setDownloadQueue(prev =>
                                     prev.filter(

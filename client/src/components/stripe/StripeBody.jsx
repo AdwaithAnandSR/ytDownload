@@ -41,6 +41,11 @@ const StripeBody = ({ item: info }) => {
                     info={info}
                 />
             </View>
+            <View>
+                {info?.searchResult?.map(item => (
+                    <Text key={item._id} style={{ color: "white", width: '95%', fontSize: 10, }}>{item?.title}</Text>
+                ))}
+            </View>
             <TouchableOpacity
                 onPress={() =>
                     setDownloadQueue(prev =>
@@ -87,7 +92,7 @@ const styles = StyleSheet.create({
     },
     wrapper2: {
         width: "100%",
-        
+
         flexDirection: "row",
         justifyContent: "center"
     },

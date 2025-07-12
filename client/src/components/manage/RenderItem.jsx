@@ -22,13 +22,14 @@ const RenderItem = ({ item }) => {
     );
 
     useEffect(() => {
-        setArtist(
-            item.artist.toLowerCase() !== "unknown" ? item.artist : " "
-        );
+        setArtist(item.artist.toLowerCase() !== "unknown" ? item.artist : " ");
     }, [item.artist]);
 
     return (
         <View style={styles.listItem}>
+            <Text selectable style={{ color: "#1f38a9" }}>
+                {item._id}
+            </Text>
             <View
                 style={{
                     flexDirection: "row",
@@ -131,7 +132,7 @@ const RenderItem = ({ item }) => {
 const styles = StyleSheet.create({
     listItem: {
         width: "98%",
-        height: 650,
+        height: 800,
         marginHorizontal: "auto",
         marginVertical: 10,
         borderRadius: 18,
@@ -154,10 +155,10 @@ const styles = StyleSheet.create({
         overflow: "hidden",
         width: "50%",
         alignItems: "center",
-        height: "90%"
+        
     },
     right: {
-        height: "90%",
+        
         overflow: "hidden",
         width: "50%",
         alignItems: "center"
