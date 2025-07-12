@@ -99,8 +99,8 @@ const getFileInfo = async (req, res) => {
                 );
                 
                 console.log(searchResult.data)
-
                 console.log(output.title);
+
                 return res
                     .status(200)
                     .json({
