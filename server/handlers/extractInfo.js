@@ -1,14 +1,13 @@
 import axios from "axios";
 import { spawn } from "child_process";
 
-
 import sanitizeUrl from "../utils/sanitizeUrl.js";
 
 function extractYouTubeID(url) {
-  const match = url.match(
-    /(?:v=|\/shorts\/|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
-  );
-  return match ? match[1] : null;
+    const match = url.match(
+        /(?:v=|\/shorts\/|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
+    );
+    return match ? match[1] : null;
 }
 
 const getFileInfo = async (req, res) => {
@@ -17,32 +16,33 @@ const getFileInfo = async (req, res) => {
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 
-
-    const existId = extractYouTubeID(url)
-    if(existId) {
+    const existId = extractYouTubeID(url);
+    if (existId) {
         const isExistsRes = await axios.post(
-                    "https://vivid-music.vercel.app/checkSongExistsByYtId",
-                    { id: existId }
-                );
+            "https://vivid-music.vercel.app/checkSongExistsByYtId",
+            { id: existId }
+        );
 
-                if (isExistsRes.data.exists) {
-                    return res.status(410).json({
-                        message: "song already exists ",
-                        title: output.title
-                    });
-                }
+        if (isExistsRes.data.exists) {
+            return res.status(410).json({
+                message: "song already exists ",
+                title: output.title
+            });
+        }
     }
 
     console.log("get info: ", url);
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
-  "--verbose",
-  "--dump-json",
-  "--no-warnings",
-  "--cookies", "./cookies.txt",
-  "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
-  url
-]);
+        "--verbose",
+        "--dump-json",
+        "--no-warnings",
+        "--cookies",
+        "./cookies.txt",
+        "--user-agent",
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+        url
+    ]);
 
     let json = "";
 
@@ -80,7 +80,7 @@ const getFileInfo = async (req, res) => {
 
                 const isExistsRes = await axios.post(
                     "https://vivid-music.vercel.app/checkSongExistsByYtId",
-                    { id: output.id }
+                    { id: output.id, title }
                 );
 
                 if (isExistsRes.data.exists) {
@@ -90,8 +90,18 @@ const getFileInfo = async (req, res) => {
                     });
                 }
 
+                let splitTitle = output.title.split(" ");
+                let searchText = `${splitTitle[0]} ${splitTitle[1]}`;
+
+                const searchResult = await axios.post(
+                    "https://vivid-music.vercel.app/searchSong",
+                    { text: searchText }
+                );
+
                 console.log(output.title);
-                return res.status(200).json({ success: true, data: output });
+                return res
+                    .status(200)
+                    .json({ success: true, data: output, searchResult: searchResult.data.songs });
             } catch (err) {
                 console.error("Failed to parse JSON:", err);
                 return res.status(450).json({
