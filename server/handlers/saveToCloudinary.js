@@ -32,6 +32,11 @@ const uploadFromUrl = (url, folder, type) =>
 
 export const saveToCloud = async (req, res) => {
     const { audioUrl, coverUrl, id, title, artist, duration } = req.body;
+
+    console.log(`🍄 upload process started for ${title}...`);
+
+    console.log(audioUrl, coverUrl, id, artist, duration)
+
     if (!audioUrl || !coverUrl || !id || !title)
         return res
             .status(400)
@@ -65,32 +70,25 @@ export const saveToCloud = async (req, res) => {
         );
 
         return add.success
-            ? res
-                  .status(200)
-                  .json({
-                      success: true,
-                      message: "Uploaded successfully",
-                      title
-                  })
-            : res
-                  .status(502)
-                  .json({
-                      success: false,
-                      message: "Downstream addSong failed",
-                      title
-                  });
+            ? res.status(200).json({
+                  success: true,
+                  message: "Uploaded successfully",
+                  title
+              })
+            : res.status(502).json({
+                  success: false,
+                  message: "Downstream addSong failed",
+                  title
+              });
     } catch (err) {
         console.error("❌ Upload failed:", err);
-        return res
-            .status(500)
-            .json({
-                success: false,
-                message: "Upload failed",
-                title,
-                error: String(err)
-            });
+        return res.status(500).json({
+            success: false,
+            message: "Upload failed",
+            title,
+            error: String(err)
+        });
     }
 };
 
-
-export default saveToCloud
+export default saveToCloud;
