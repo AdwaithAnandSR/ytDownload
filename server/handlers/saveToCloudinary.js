@@ -1,148 +1,187 @@
 import { spawn } from "child_process";
+import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
-import axios from "axios";
+import path from "path";
 import https from "https";
-import cloudinaryModule from "cloudinary";
-import streamifier from "streamifier";
-import dotenv from "dotenv";
+import sanitizeUrl from "../utils/sanitizeUrl.js";
+import dotenv from "dotenv"
+
 dotenv.config()
 
-const cloudinary = cloudinaryModule.v2;
-
 cloudinary.config({
-    cloud_name: process.env.CLOUDINARY_NAME,
-    api_key: process.env.CLOUDINARY_KEY,
-    api_secret: process.env.CLOUDINARY_SECRET
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
-const saveToCloud = async (req, res) => {
-    const { audioUrl, coverUrl, id, title, artist, duration } = req.body;
+const saveToCloudinary = async (req, res) => {
+    let { url, audioFormat } = req.body;
 
-    let songPublicUrl = null;
-    let coverPublicUrl = null;
+    url = sanitizeUrl(url);
+    if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
 
-    const uploadImageFromUrl = async url => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await axios({
-                    method: "get",
-                    url,
-                    responseType: "stream",
-                    timeout: 60000, // 10 seconds
-                    headers: {
-                        "User-Agent": "Mozilla/5.0"
-                    }
-                });
-
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: "image",
-                        folder: "covers/"
-                    },
-                    (error, result) => {
-                        if (error) return reject(error);
-                        resolve(result.secure_url);
-                    }
-                );
-
-                response.data.pipe(uploadStream);
-            } catch (err) {
-                reject(err);
-            }
-        });
-    };
-
-    const uploadAudioFromUrl = async url => {
-        return new Promise(async (resolve, reject) => {
-            try {
-                const response = await axios({
-                    method: "get",
-                    url,
-                    responseType: "stream",
-                    timeout: 60000, // 20 seconds
-                    headers: {
-                        "User-Agent": "Mozilla/5.0"
-                    }
-                });
-
-                const uploadStream = cloudinary.uploader.upload_stream(
-                    {
-                        resource_type: "video",
-                        folder: "songs/"
-                    },
-                    (error, result) => {
-                        if (error) return reject(error);
-                        resolve(result.secure_url);
-                    }
-                );
-
-                response.data.pipe(uploadStream);
-            } catch (err) {
-                reject(err);
-            }
-        });
-    };
+    console.log("\n============================================================");
+    console.log("🚀 STARTING UPLOAD PROCESS");
+    console.log("============================================================");
 
     try {
-        const isExistsRes = await axios.post(
-            "https://vivid-music.vercel.app/checkSongExistsByYtId",
-            { id }
-        );
+        // First get video info
+        const ytdlpInfo = spawn("yt-dlp", [
+            "--dump-json",
+            "--no-warnings",
+            "--cookies",
+            "./cookies.txt",
+            "--geo-bypass",
+            "--geo-bypass-country=US",
+            url
+        ]);
 
-        if (isExistsRes.data.exists) {
-            return res
-                .status(409)
-                .json({ message: "song already exists ", title });
-        }
-        
-        console.log('\n\nUoloading...\n')
+        let infoJson = "";
+        ytdlpInfo.stdout.on("data", data => {
+            infoJson += data.toString();
+        });
 
-        coverPublicUrl = await uploadImageFromUrl(coverUrl);
-        songPublicUrl = await uploadAudioFromUrl(audioUrl);
-
-        console.log(title, songPublicUrl, id);
-
-        if (!title || !songPublicUrl || !id)
-            return res.status(400).json({
-                success: false,
-                message: "some values missing",
-                title
+        await new Promise((resolve, reject) => {
+            ytdlpInfo.on("close", code => {
+                if (code === 0) resolve();
+                else reject(new Error(`yt-dlp info failed with code ${code}`));
             });
+        });
 
-        const response = await axios.post(
-            "https://vivid-music.vercel.app/addSong",
-            {
+        const metadata = JSON.parse(infoJson);
+        const title = metadata.title;
+        const id = metadata.id;
+        const artist = metadata.artist || "unknown";
+        const duration = metadata.duration;
+        const thumbnail = metadata.thumbnail;
+
+        console.log(`📝 Title: ${title}`);
+        console.log(`⏱️ Duration: ${duration}s`);
+        console.log("============================================================\n");
+
+        // Create temporary directory
+        const tempDir = `/tmp/${id}`;
+        if (!fs.existsSync(tempDir)) {
+            fs.mkdirSync(tempDir, { recursive: true });
+        }
+
+        const audioFile = path.join(tempDir, `${id}.webm`);
+        const coverFile = path.join(tempDir, `${id}.webp`);
+
+        // Start both downloads simultaneously
+        const audioPromise = new Promise((resolve, reject) => {
+            console.log("🎵 Downloading audio file... ");
+
+            const ytdlpAudio = spawn("yt-dlp", [
+                "-f", audioFormat || "bestaudio",
+                "--extract-audio",
+                "--audio-format", "webm",
+                "--cookies", "./cookies.txt",
+                "--geo-bypass",
+                "--geo-bypass-country=US",
+                "-o", audioFile,
+                url
+            ]);
+
+            ytdlpAudio.on("close", code => {
+                if (code === 0 && fs.existsSync(audioFile)) {
+                    resolve();
+                } else {
+                    reject(new Error(`Audio download failed with code ${code}`));
+                }
+            });
+        });
+
+        const coverPromise = new Promise((resolve, reject) => {
+            console.log("📷 Downloading cover image...");
+
+            const file = fs.createWriteStream(coverFile);
+            https.get(thumbnail, response => {
+                response.pipe(file);
+                file.on('finish', () => {
+                    file.close();
+                    resolve();
+                });
+            }).on('error', reject);
+        });
+
+        // Wait for both downloads to complete
+        await Promise.all([audioPromise, coverPromise]);
+
+        // Upload both files simultaneously to Cloudinary
+        const audioUploadPromise = new Promise((resolve, reject) => {
+            console.log("🎵 Uploading audio file to Cloudinary... ");
+
+            cloudinary.uploader.upload(audioFile, {
+                resource_type: "video",
+                folder: "songs",
+                public_id: id
+            }, (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    console.log("🎵 Audio file uploaded successfully ✅");
+                    resolve(result.secure_url);
+                }
+            });
+        });
+
+        const coverUploadPromise = new Promise((resolve, reject) => {
+            console.log("📷 Uploading cover image to Cloudinary...");
+
+            cloudinary.uploader.upload(coverFile, {
+                resource_type: "image",
+                folder: "covers",
+                public_id: id
+            }, (error, result) => {
+                if (error) {
+                    reject(error);
+                } else {
+                    console.log("📷 Cover image uploaded successfully ✅");
+                    resolve(result.secure_url);
+                }
+            });
+        });
+
+        // Wait for both uploads to complete
+        const [songUrl, coverUrl] = await Promise.all([audioUploadPromise, coverUploadPromise]);
+
+        // Clean up temporary files
+        try {
+            if (fs.existsSync(audioFile)) fs.unlinkSync(audioFile);
+            if (fs.existsSync(coverFile)) fs.unlinkSync(coverFile);
+            if (fs.existsSync(tempDir)) fs.rmdirSync(tempDir);
+        } catch (cleanupError) {
+            console.error("Cleanup error:", cleanupError);
+        }
+
+        console.log("\n============================================================");
+        console.log("✅ UPLOAD COMPLETED SUCCESSFULLY");
+        console.log("============================================================");
+        console.log(`📝 Title: ${title}`);
+        console.log(`🔗 Song URL: ${songUrl}`);
+        console.log(`🖼️ Cover URL: ${coverUrl}`);
+        console.log("============================================================\n");
+
+        res.status(200).json({
+            success: true,
+            data: {
                 title,
-                songURL: songPublicUrl,
-                coverURL: coverPublicUrl,
                 id,
                 artist,
-                duration
+                duration,
+                songUrl,
+                coverUrl
             }
-        );
+        });
 
-        if (response.status === 200 && response.data.success)
-            return res.status(200).json({
-                success: true,
-                message: "uploaded successfully",
-                title
-            });
-        else
-            return res.status(410).json({
-                success: false,
-                message: "unexpected error",
-                title
-                
-            });
-    } catch (err) {
-        console.error("❌ Upload failed:", err);
-        return res.status(500).json({
+    } catch (error) {
+        console.error("Upload process failed:", error);
+        res.status(500).json({
             success: false,
-            message: "Upload failed",
-            title,
-            error: err.toString()
+            error: error.message
         });
     }
 };
 
-export default saveToCloud;
+export default saveToCloudinary;

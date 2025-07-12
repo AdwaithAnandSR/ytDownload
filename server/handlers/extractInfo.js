@@ -4,6 +4,7 @@ import { spawn } from "child_process";
 import sanitizeUrl from "../utils/sanitizeUrl.js";
 
 function extractYouTubeID(url) {
+
     const match = url.match(
         /(?:v=|\/shorts\/|\/embed\/|youtu\.be\/)([a-zA-Z0-9_-]{11})/
     );
@@ -12,6 +13,7 @@ function extractYouTubeID(url) {
 
 const getFileInfo = async (req, res) => {
     let { url } = req.body;
+    console.log("get info: ", url);
 
     url = sanitizeUrl(url);
     if (!url) return res.status(400).json({ error: "Missing YouTube URL" });
@@ -31,7 +33,6 @@ const getFileInfo = async (req, res) => {
         }
     }
 
-    console.log("get info: ", url);
     // Spawn yt-dlp with cookies
     const ytdlp = spawn("yt-dlp", [
         "--verbose",
@@ -90,24 +91,12 @@ const getFileInfo = async (req, res) => {
                     });
                 }
 
-                let splitTitle = output.title.split(" ");
-                let searchText = `${splitTitle[0]} ${splitTitle[1]}`;
-
-                const searchResult = await axios.post(
-                    "https://vivid-music.vercel.app/searchSong",
-                    { text: searchText }
-                );
-                
-                console.log(searchResult.data)
                 console.log(output.title);
 
-                return res
-                    .status(200)
-                    .json({
-                        success: true,
-                        data: output,
-                        searchResult: searchResult
-                    });
+                return res.status(200).json({
+                    success: true,
+                    data: output
+                });
             } catch (err) {
                 console.error("Failed to parse JSON:", err);
                 return res.status(450).json({
