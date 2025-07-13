@@ -1,6 +1,6 @@
 import axios from "axios";
 import { spawn } from "child_process";
-import detenv from "dotenv";
+import dotenv from "dotenv";
 
 dotenv.config()
 

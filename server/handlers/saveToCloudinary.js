@@ -4,6 +4,10 @@ import cloudinaryModule from "cloudinary";
 import dotenv from "dotenv";
 dotenv.config();
 
+console.log(process.env.CLOUDINARY_NAME)
+console.log(process.env.CLOUDINARY_KEY)
+console.log(process.env.CLOUDINARY_SECRET)
+
 const cloudinary = cloudinaryModule.v2;
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_NAME,
