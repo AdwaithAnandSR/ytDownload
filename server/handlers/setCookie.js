@@ -26,6 +26,9 @@ const handleSetCookie = async (req, res) => {
     try {
         let { cookie } = req.body;
 
+
+console.log(cookie)
+
         console.log("setting new cookie ..");
 
         const newCookie = convert(cookie);
