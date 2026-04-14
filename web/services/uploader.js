@@ -109,6 +109,10 @@ async function getYtDlpInfo(source) {
 
         proc.stdout.on("data", c => (data += c.toString()));
 
+        proc.stderr.on("data", d => {
+            console.error("yt-dlp stderr:", d.toString());
+        });
+
         proc.on("close", code => {
             if (code !== 0) return reject(new Error("yt-dlp info failed"));
 
