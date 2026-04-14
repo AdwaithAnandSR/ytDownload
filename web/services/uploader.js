@@ -103,7 +103,13 @@ function emit(sessionId, type, payload = {}) {
 // ─────────────────────────────────────────────
 async function getYtDlpInfo(source) {
     return new Promise((resolve, reject) => {
-        const proc = spawn("yt-dlp", ["-J", "--flat-playlist", source]);
+        const proc = spawn("yt-dlp", [
+            "-J",
+            "--flat-playlist",
+            "--cookies",
+            "cookies.txt",
+            source
+        ]);
 
         let data = "";
 
