@@ -1,0 +1,1170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>VividMusic — Uploader</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── Reset & Base ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #07070f;
+      --surface:   #0f0f1c;
+      --surface2:  #14142a;
+      --border:    #1e1e38;
+      --border2:   #2a2a50;
+      --text:      #e8e8f0;
+      --muted:     #6b6b90;
+      --green:     #00e87a;
+      --green-dim: #00e87a22;
+      --amber:     #ffb733;
+      --amber-dim: #ffb73322;
+      --coral:     #ff5a5a;
+      --coral-dim: #ff5a5a22;
+      --blue:      #4da6ff;
+      --blue-dim:  #4da6ff22;
+      --violet:    #b66cff;
+      --violet-dim:#b66cff22;
+      --skip:      #666688;
+      --skip-dim:  #66668822;
+      --r:         12px;
+      --font-head: 'Syne', sans-serif;
+      --font-body: 'DM Sans', sans-serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    html, body { height: 100%; overflow: hidden; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── App Shell ─────────────────────────────────────────── */
+    #app {
+      max-width: 520px;
+      margin: 0 auto;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: var(--bg);
+      position: relative;
+    }
+
+    /* ── Header ────────────────────────────────────────────── */
+    #header {
+      padding: 14px 18px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      flex-shrink: 0;
+      position: relative;
+      z-index: 10;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-family: var(--font-head);
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    .logo-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 8px var(--green);
+      flex-shrink: 0;
+    }
+
+    .logo-dot.pulse { animation: pulse 1.4s ease-in-out infinite; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); box-shadow: 0 0 8px var(--green); }
+      50%       { opacity: 0.5; transform: scale(0.8); box-shadow: 0 0 2px var(--green); }
+    }
+
+    .header-action {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 6px;
+      padding: 5px 10px;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+      white-space: nowrap;
+    }
+
+    .header-action:hover { color: var(--text); border-color: var(--border2); }
+
+    /* ── Scrollable Content ─────────────────────────────────── */
+    #content {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+    }
+
+    #content::-webkit-scrollbar { width: 4px; }
+    #content::-webkit-scrollbar-track { background: transparent; }
+    #content::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+    /* ── Views ──────────────────────────────────────────────── */
+    .view { display: none; }
+    .view.active { display: block; }
+
+    /* ── Setup View ─────────────────────────────────────────── */
+    #setup-view { padding: 20px 16px 32px; }
+
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 500;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+      padding-left: 2px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .card-title {
+      font-family: var(--font-head);
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card-title .icon {
+      width: 26px; height: 26px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    .field { margin-bottom: 10px; }
+    .field:last-child { margin-bottom: 0; }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 5px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.3px;
+    }
+
+    input[type="text"], input[type="password"], input[type="number"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-family: var(--font-mono);
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input:focus {
+      border-color: var(--violet);
+      box-shadow: 0 0 0 3px var(--violet-dim);
+    }
+
+    input::placeholder { color: var(--muted); opacity: 0.6; }
+
+    .secret-wrap {
+      position: relative;
+    }
+
+    .secret-wrap input { padding-right: 40px; }
+
+    .toggle-secret {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 15px;
+      padding: 4px;
+      line-height: 1;
+      transition: color 0.2s;
+    }
+
+    .toggle-secret:hover { color: var(--text); }
+
+    .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    .btn-start {
+      width: 100%;
+      background: linear-gradient(135deg, #5b21b6, #7c3aed);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      font-family: var(--font-head);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: opacity 0.2s, transform 0.15s;
+      margin-top: 6px;
+    }
+
+    .btn-start:active { transform: scale(0.98); }
+    .btn-start:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    .error-box {
+      background: var(--coral-dim);
+      border: 1px solid var(--coral);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 12px;
+      color: var(--coral);
+      margin-bottom: 12px;
+      display: none;
+    }
+
+    /* ── Status View ─────────────────────────────────────────── */
+    #status-view {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    #status-view.active {
+      display: flex;
+    }
+
+    .status-top {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: var(--surface);
+    }
+
+    .session-id {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .source-row {
+      font-size: 12px;
+      color: var(--muted);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      margin-bottom: 12px;
+    }
+
+    .source-row strong { color: var(--text); font-weight: 600; }
+
+    /* Segmented progress bar */
+    .seg-bar {
+      height: 6px;
+      border-radius: 10px;
+      background: var(--surface2);
+      overflow: hidden;
+      display: flex;
+      margin-bottom: 10px;
+    }
+
+    .seg-bar-fill {
+      height: 100%;
+      transition: width 0.4s ease;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
+    .stat-cell {
+      background: var(--surface2);
+      border-radius: 8px;
+      padding: 7px 4px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+
+    .stat-num {
+      font-family: var(--font-mono);
+      font-size: 16px;
+      font-weight: 500;
+      display: block;
+    }
+
+    .stat-label {
+      font-size: 9px;
+      font-family: var(--font-mono);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+      display: block;
+      margin-top: 1px;
+    }
+
+    .stat-cell.done   .stat-num { color: var(--green); }
+    .stat-cell.fail   .stat-num { color: var(--coral); }
+    .stat-cell.skip   .stat-num { color: var(--skip); }
+    .stat-cell.proc   .stat-num { color: var(--blue); }
+    .stat-cell.pend   .stat-num { color: var(--muted); }
+
+    /* Queue */
+    .queue-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 16px 8px;
+      flex-shrink: 0;
+    }
+
+    .queue-title {
+      font-family: var(--font-head);
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .queue-count {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Virtual scroll container */
+    #queue-scroll {
+      flex: 1;
+      overflow-y: auto;
+      overflow-x: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border2) transparent;
+      padding: 0 12px 12px;
+    }
+
+    #queue-scroll::-webkit-scrollbar { width: 3px; }
+    #queue-scroll::-webkit-scrollbar-thumb { background: var(--border2); }
+
+    #queue-inner {
+      position: relative;
+      width: 100%;
+    }
+
+    /* Job card */
+    .job-card {
+      position: absolute;
+      left: 0; right: 0;
+    }
+
+    .job-inner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--border);
+      border-radius: 10px;
+      padding: 9px 10px;
+      height: 74px;
+      overflow: hidden;
+      margin-bottom: 6px;
+      transition: border-left-color 0.3s;
+    }
+
+    .job-thumb {
+      width: 52px; height: 52px;
+      border-radius: 7px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--surface2);
+    }
+
+    .job-thumb-placeholder {
+      width: 52px; height: 52px;
+      border-radius: 7px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .job-body {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .job-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      line-height: 1.3;
+    }
+
+    .job-author {
+      font-size: 10px;
+      color: var(--muted);
+      margin-top: 2px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .job-progress-wrap {
+      margin-top: 6px;
+      background: var(--surface2);
+      border-radius: 3px;
+      height: 3px;
+      overflow: hidden;
+    }
+
+    .job-progress-bar {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+
+    .job-error {
+      font-size: 10px;
+      color: var(--coral);
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .job-right {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 3px;
+    }
+
+    .job-badge {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      font-weight: 500;
+      padding: 3px 6px;
+      border-radius: 4px;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .job-pct {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+    }
+
+    /* Empty/Loading states */
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state .big { font-size: 36px; margin-bottom: 10px; }
+    .empty-state p    { font-size: 13px; line-height: 1.6; }
+
+    /* Completed banner */
+    .done-banner {
+      margin: 12px 16px 0;
+      background: var(--green-dim);
+      border: 1px solid var(--green);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 12px;
+      color: var(--green);
+      display: none;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .done-banner.show { display: flex; }
+    .done-banner .exp { margin-left: auto; font-family: var(--font-mono); font-size: 10px; opacity: 0.7; }
+
+    /* Loading overlay */
+    #loading-overlay {
+      display: none;
+      position: absolute;
+      inset: 0;
+      background: var(--bg);
+      z-index: 50;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    #loading-overlay.show { display: flex; }
+
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid var(--border2);
+      border-top-color: var(--violet);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-msg {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    /* Misc */
+    .separator { height: 1px; background: var(--border); margin: 14px 0; }
+    .hint { font-size: 11px; color: var(--muted); line-height: 1.5; margin-top: 6px; padding: 0 2px; }
+
+    /* Saved credentials badge */
+    .saved-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--green);
+      background: var(--green-dim);
+      border: 1px solid var(--green);
+      padding: 2px 7px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+<div id="app">
+
+  <!-- ══ Header ══════════════════════════════════════════════ -->
+  <div id="header">
+    <div class="logo">
+      <div class="logo-dot" id="logo-dot"></div>
+      VividMusic
+    </div>
+    <div id="header-action"></div>
+  </div>
+
+  <!-- ══ Loading Overlay ════════════════════════════════════ -->
+  <div id="loading-overlay">
+    <div class="spinner"></div>
+    <div class="loading-msg" id="loading-msg">Resolving YouTube source…</div>
+  </div>
+
+  <!-- ══ Setup View ══════════════════════════════════════════ -->
+  <div id="setup-view" class="view active">
+    <div id="content">
+      <div id="setup-view-inner">
+        <div style="padding: 20px 16px 0;">
+          <div id="setup-error" class="error-box"></div>
+        </div>
+
+        <!-- Cloudinary credentials -->
+        <div style="padding: 0 16px;">
+          <div class="card" style="margin-top: 14px;">
+            <div class="card-title">
+              <div class="icon" style="background:#1a1230;">☁️</div>
+              Cloudinary Credentials
+              <span id="saved-creds-badge" style="display:none;" class="saved-badge" onclick="clearSavedCreds()">✕ clear saved</span>
+            </div>
+
+            <div class="field">
+              <label>CLOUD NAME</label>
+              <input type="text" id="cloud-name" placeholder="my-cloud" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label>API KEY</label>
+              <input type="text" id="api-key" placeholder="123456789012345" autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field">
+              <label>API SECRET</label>
+              <div class="secret-wrap">
+                <input type="password" id="api-secret" placeholder="••••••••••••••••••••••" autocomplete="off" />
+                <button class="toggle-secret" onclick="toggleSecret()" id="secret-toggle" aria-label="Toggle secret">👁</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- YouTube source -->
+          <div class="card">
+            <div class="card-title">
+              <div class="icon" style="background:#1a0a0a;">▶️</div>
+              YouTube Source
+            </div>
+
+            <div class="field">
+              <label>VIDEO / PLAYLIST / CHANNEL URL OR ID</label>
+              <input type="text" id="yt-source"
+                placeholder="youtu.be/… or PL… or @channel or UC…"
+                autocomplete="off" spellcheck="false" />
+              <p class="hint">Supports: video URL/ID, playlist URL/ID, channel URL/handle/ID</p>
+            </div>
+
+            <div class="separator"></div>
+
+            <div class="row-2">
+              <div class="field">
+                <label>LIMIT</label>
+                <input type="number" id="limit" value="50" min="1" max="500" />
+              </div>
+              <div class="field">
+                <label>SKIP</label>
+                <input type="number" id="skip" value="0" min="0" />
+              </div>
+            </div>
+            <p class="hint">Limit/skip act as pagination for playlists & channels.</p>
+          </div>
+
+          <button class="btn-start" id="btn-start" onclick="startUpload()">
+            ▶ Start Upload
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ Status View ═════════════════════════════════════════ -->
+  <div id="status-view" class="view">
+
+    <!-- Stats panel -->
+    <div class="status-top">
+      <div class="session-id" id="session-id-label">Session —</div>
+      <div class="source-row" id="source-label">—</div>
+
+      <!-- Segmented bar -->
+      <div class="seg-bar" id="seg-bar">
+        <div class="seg-bar-fill" id="seg-done"  style="background:var(--green);  width:0%;"></div>
+        <div class="seg-bar-fill" id="seg-fail"  style="background:var(--coral);  width:0%;"></div>
+        <div class="seg-bar-fill" id="seg-skip"  style="background:var(--skip);   width:0%;"></div>
+        <div class="seg-bar-fill" id="seg-proc"  style="background:var(--blue);   width:0%;"></div>
+      </div>
+
+      <!-- Stats numbers -->
+      <div class="stats-grid">
+        <div class="stat-cell done">
+          <span class="stat-num" id="stat-done">0</span>
+          <span class="stat-label">Done</span>
+        </div>
+        <div class="stat-cell fail">
+          <span class="stat-num" id="stat-fail">0</span>
+          <span class="stat-label">Failed</span>
+        </div>
+        <div class="stat-cell skip">
+          <span class="stat-num" id="stat-skip">0</span>
+          <span class="stat-label">Skipped</span>
+        </div>
+        <div class="stat-cell proc">
+          <span class="stat-num" id="stat-proc">0</span>
+          <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-cell pend">
+          <span class="stat-num" id="stat-pend">0</span>
+          <span class="stat-label">Pending</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed banner -->
+    <div class="done-banner" id="done-banner">
+      <span>✅</span>
+      <span id="done-banner-text">Upload complete</span>
+      <span class="exp" id="done-banner-exp"></span>
+    </div>
+
+    <!-- Queue -->
+    <div class="queue-header">
+      <div class="queue-title">Queue</div>
+      <div class="queue-count" id="queue-count">0 items</div>
+    </div>
+
+    <div id="queue-scroll" onscroll="onQueueScroll()">
+      <div id="queue-inner"></div>
+    </div>
+  </div><!-- /status-view -->
+
+</div><!-- /app -->
+
+<script>
+// ═══════════════════════════════════════════════════════════════
+// State
+// ═══════════════════════════════════════════════════════════════
+let sessionId   = null;
+let eventSource = null;
+let jobs        = [];
+let jobMap      = new Map();   // jobId → index in jobs[]
+let stats       = { total: 0, pending: 0, processing: 0, completed: 0, skipped: 0, failed: 0 };
+let renderedItems = new Map(); // index → DOM element
+
+const ITEM_H    = 80;   // px per job card (including gap)
+const OVERSCAN  = 5;    // extra items above/below viewport
+
+// ═══════════════════════════════════════════════════════════════
+// Status config
+// ═══════════════════════════════════════════════════════════════
+const STATUS = {
+  pending:     { color: 'var(--muted)',   bg: 'var(--surface2)', label: 'Pending',     icon: '·' },
+  checking:    { color: 'var(--amber)',   bg: 'var(--amber-dim)', label: 'Checking',   icon: '?' },
+  downloading: { color: 'var(--blue)',    bg: 'var(--blue-dim)',  label: 'Downloading', icon: '↓' },
+  uploading:   { color: 'var(--violet)',  bg: 'var(--violet-dim)',label: 'Uploading',  icon: '↑' },
+  saving:      { color: 'var(--amber)',   bg: 'var(--amber-dim)', label: 'Saving',     icon: '💾' },
+  completed:   { color: 'var(--green)',   bg: 'var(--green-dim)', label: 'Done',       icon: '✓' },
+  skipped:     { color: 'var(--skip)',    bg: 'var(--skip-dim)',  label: 'Skipped',    icon: '—' },
+  failed:      { color: 'var(--coral)',   bg: 'var(--coral-dim)', label: 'Failed',     icon: '✗' },
+};
+
+// ═══════════════════════════════════════════════════════════════
+// Virtual list
+// ═══════════════════════════════════════════════════════════════
+function onQueueScroll() {
+  renderVirtualList();
+}
+
+function renderVirtualList() {
+  const scroller = document.getElementById('queue-scroll');
+  const inner    = document.getElementById('queue-inner');
+  if (!scroller || !inner) return;
+
+  const scrollTop      = scroller.scrollTop;
+  const viewHeight     = scroller.clientHeight;
+  const totalH         = jobs.length * ITEM_H;
+  inner.style.height   = totalH + 'px';
+
+  if (jobs.length === 0) {
+    inner.innerHTML = '';
+    renderedItems.clear();
+    return;
+  }
+
+  const start = Math.max(0, Math.floor(scrollTop / ITEM_H) - OVERSCAN);
+  const end   = Math.min(jobs.length - 1, Math.ceil((scrollTop + viewHeight) / ITEM_H) + OVERSCAN);
+
+  // Remove out-of-range
+  for (const [idx, el] of renderedItems) {
+    if (idx < start || idx > end) {
+      el.remove();
+      renderedItems.delete(idx);
+    }
+  }
+
+  // Add visible
+  for (let i = start; i <= end; i++) {
+    if (!renderedItems.has(i)) {
+      const el = buildJobCard(jobs[i], i);
+      inner.appendChild(el);
+      renderedItems.set(i, el);
+    }
+  }
+}
+
+function buildJobCard(job, idx) {
+  const s   = STATUS[job.status] || STATUS.pending;
+  const top = idx * ITEM_H;
+  const el  = document.createElement('div');
+  el.className    = 'job-card';
+  el.dataset.jobId = job.id;
+  el.style.top    = top + 'px';
+
+  const title = truncate(job.title || `yt:${job.videoId}`, 52);
+  const author = truncate(job.author || 'Unknown', 36);
+  const showBar = ['downloading', 'uploading'].includes(job.status);
+
+  el.innerHTML = `
+    <div class="job-inner" style="border-left-color:${s.color};">
+      ${job.thumbnail
+        ? `<img class="job-thumb" src="${escHtml(job.thumbnail)}" loading="lazy" onerror="this.style.display='none'" />`
+        : `<div class="job-thumb-placeholder">🎵</div>`}
+      <div class="job-body">
+        <div class="job-title">${escHtml(title)}</div>
+        <div class="job-author">${escHtml(author)}</div>
+        ${showBar ? `
+          <div class="job-progress-wrap">
+            <div class="job-progress-bar" style="background:${s.color}; width:${job.progress}%;"></div>
+          </div>` : ''}
+        ${job.error && job.status === 'failed'
+          ? `<div class="job-error">⚠ ${escHtml(truncate(job.error, 60))}</div>` : ''}
+        ${job.status === 'skipped' && job.error
+          ? `<div class="job-error" style="color:var(--skip);">${escHtml(truncate(job.error, 60))}</div>` : ''}
+      </div>
+      <div class="job-right">
+        <span class="job-badge" style="color:${s.color}; background:${s.bg};">${s.icon} ${s.label}</span>
+        ${showBar ? `<span class="job-pct">${job.progress}%</span>` : ''}
+      </div>
+    </div>`;
+  return el;
+}
+
+function refreshJobCard(jobId) {
+  const idx = jobMap.get(jobId);
+  if (idx == null) return;
+  if (renderedItems.has(idx)) {
+    const oldEl = renderedItems.get(idx);
+    const newEl = buildJobCard(jobs[idx], idx);
+    oldEl.replaceWith(newEl);
+    renderedItems.set(idx, newEl);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// SSE
+// ═══════════════════════════════════════════════════════════════
+function connectSSE(sid) {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+
+  eventSource = new EventSource(`/api/upload/status/${sid}`);
+
+  eventSource.onmessage = (e) => {
+    try { handleEvent(JSON.parse(e.data)); }
+    catch (err) { console.warn('SSE parse error', err); }
+  };
+
+  eventSource.onerror = () => {
+    // Silent reconnect — browser handles it automatically
+  };
+}
+
+function handleEvent(data) {
+  switch (data.type) {
+
+    case 'init': {
+      const s = data.session;
+      jobs   = s.jobs || [];
+      stats  = s.stats;
+      jobMap = new Map(jobs.map((j, i) => [j.id, i]));
+      renderedItems.clear();
+      document.getElementById('queue-count').textContent = `${jobs.length} items`;
+      updateStats(stats);
+      renderVirtualList();
+      if (s.status === 'completed' || s.status === 'failed') showDoneBanner(s);
+      hideLoading();
+      break;
+    }
+
+    case 'initialized': {
+      jobs   = data.jobs || [];
+      stats  = data.stats;
+      jobMap = new Map(jobs.map((j, i) => [j.id, i]));
+      renderedItems.clear();
+      document.getElementById('queue-count').textContent = `${jobs.length} items`;
+      updateStats(stats);
+      renderVirtualList();
+      hideLoading();
+      break;
+    }
+
+    case 'job_update': {
+      const updated = data.job;
+      const idx = jobMap.get(updated.id);
+      if (idx != null) {
+        Object.assign(jobs[idx], updated);
+        refreshJobCard(updated.id);
+      }
+      if (data.stats) updateStats(data.stats);
+      break;
+    }
+
+    case 'completed': {
+      if (data.stats) { stats = data.stats; updateStats(stats); }
+      showDoneBanner({ status: 'completed', expiresAt: data.expiresAt });
+      document.getElementById('logo-dot').classList.remove('pulse');
+      break;
+    }
+
+    case 'error': {
+      showDoneBanner({ status: 'failed', message: data.message });
+      document.getElementById('logo-dot').classList.remove('pulse');
+      break;
+    }
+
+    case 'status': {
+      setLoadingMsg(data.message || '');
+      break;
+    }
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Stats display
+// ═══════════════════════════════════════════════════════════════
+function updateStats(s) {
+  stats = s;
+  const total = Math.max(s.total, 1);
+  const pct = (n) => ((n / total) * 100).toFixed(1) + '%';
+
+  document.getElementById('seg-done').style.width = pct(s.completed);
+  document.getElementById('seg-fail').style.width = pct(s.failed);
+  document.getElementById('seg-skip').style.width = pct(s.skipped);
+  document.getElementById('seg-proc').style.width = pct(s.processing);
+
+  document.getElementById('stat-done').textContent = s.completed;
+  document.getElementById('stat-fail').textContent = s.failed;
+  document.getElementById('stat-skip').textContent = s.skipped;
+  document.getElementById('stat-proc').textContent = s.processing;
+  document.getElementById('stat-pend').textContent = s.pending;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Done / error banner
+// ═══════════════════════════════════════════════════════════════
+function showDoneBanner(session) {
+  const banner = document.getElementById('done-banner');
+  const text   = document.getElementById('done-banner-text');
+  const exp    = document.getElementById('done-banner-exp');
+
+  if (session.status === 'failed') {
+    banner.style.background    = 'var(--coral-dim)';
+    banner.style.borderColor   = 'var(--coral)';
+    banner.style.color         = 'var(--coral)';
+    banner.querySelector('span').textContent = '❌';
+    text.textContent = session.message || 'Session failed';
+  } else {
+    const s = stats;
+    text.textContent = `Finished — ${s.completed} uploaded, ${s.failed} failed, ${s.skipped} skipped`;
+  }
+
+  if (session.expiresAt) {
+    const d = new Date(session.expiresAt);
+    exp.textContent = `Expires ${d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+  } else {
+    exp.textContent = 'expires in 24h';
+  }
+
+  banner.classList.add('show');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Start upload
+// ═══════════════════════════════════════════════════════════════
+async function startUpload() {
+  const cloudName  = val('cloud-name').trim();
+  const apiKey     = val('api-key').trim();
+  const apiSecret  = val('api-secret').trim();
+  const source     = val('yt-source').trim();
+  const limit      = parseInt(val('limit')) || 50;
+  const skip       = parseInt(val('skip'))  || 0;
+
+  const errBox = document.getElementById('setup-error');
+  errBox.style.display = 'none';
+
+  if (!cloudName || !apiKey || !apiSecret) {
+    showSetupError('All Cloudinary credentials are required.');
+    return;
+  }
+  if (!source) {
+    showSetupError('YouTube source URL or ID is required.');
+    return;
+  }
+
+  // Save credentials to localStorage (no secret)
+  localStorage.setItem('vm_cloud_name', cloudName);
+  localStorage.setItem('vm_api_key', apiKey);
+
+  document.getElementById('btn-start').disabled = true;
+
+  try {
+    const resp = await fetch('/api/upload/start', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cloudName, apiKey, apiSecret, source, limit, skip }),
+    });
+    const data = await resp.json();
+
+    if (!data.success) throw new Error(data.message || 'Failed to start session');
+
+    sessionId = data.sessionId;
+    localStorage.setItem('vm_session', sessionId);
+
+    // Switch to status view
+    switchToStatus(source, sessionId);
+    showLoading('Resolving YouTube source…');
+    connectSSE(sessionId);
+  } catch (err) {
+    showSetupError(err.message);
+    document.getElementById('btn-start').disabled = false;
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// View switching
+// ═══════════════════════════════════════════════════════════════
+function switchToStatus(source, sid) {
+  document.getElementById('setup-view').classList.remove('active');
+  document.getElementById('status-view').classList.add('active');
+
+  document.getElementById('session-id-label').textContent = `Session  ${sid}`;
+  document.getElementById('source-label').innerHTML =
+    `<strong>${truncate(source, 55)}</strong>`;
+
+  document.getElementById('logo-dot').classList.add('pulse');
+
+  // Header back button
+  document.getElementById('header-action').innerHTML =
+    `<span class="header-action" onclick="goBack()">← New Upload</span>`;
+}
+
+function goBack() {
+  if (eventSource) { eventSource.close(); eventSource = null; }
+  document.getElementById('status-view').classList.remove('active');
+  document.getElementById('setup-view').classList.add('active');
+  document.getElementById('logo-dot').classList.remove('pulse');
+  document.getElementById('header-action').innerHTML = '';
+  document.getElementById('done-banner').classList.remove('show');
+  document.getElementById('btn-start').disabled = false;
+  jobs = []; jobMap = new Map(); renderedItems = new Map();
+  document.getElementById('queue-inner').innerHTML = '';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Loading overlay
+// ═══════════════════════════════════════════════════════════════
+function showLoading(msg) {
+  setLoadingMsg(msg);
+  document.getElementById('loading-overlay').classList.add('show');
+}
+
+function hideLoading() {
+  document.getElementById('loading-overlay').classList.remove('show');
+}
+
+function setLoadingMsg(msg) {
+  document.getElementById('loading-msg').textContent = msg;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Misc helpers
+// ═══════════════════════════════════════════════════════════════
+function val(id) { return document.getElementById(id)?.value || ''; }
+function escHtml(s) {
+  return String(s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function truncate(s, n) { return s && s.length > n ? s.slice(0, n - 1) + '…' : s; }
+
+function showSetupError(msg) {
+  const box = document.getElementById('setup-error');
+  box.textContent = '⚠ ' + msg;
+  box.style.display = 'block';
+  document.getElementById('content').scrollTop = 0;
+}
+
+function toggleSecret() {
+  const inp = document.getElementById('api-secret');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+function clearSavedCreds() {
+  localStorage.removeItem('vm_cloud_name');
+  localStorage.removeItem('vm_api_key');
+  document.getElementById('cloud-name').value = '';
+  document.getElementById('api-key').value    = '';
+  document.getElementById('saved-creds-badge').style.display = 'none';
+}
+
+// ═══════════════════════════════════════════════════════════════
+// Init — restore state on page load
+// ═══════════════════════════════════════════════════════════════
+(function init() {
+  // Restore saved (non-secret) credentials
+  const savedName = localStorage.getItem('vm_cloud_name');
+  const savedKey  = localStorage.getItem('vm_api_key');
+
+  if (savedName) document.getElementById('cloud-name').value = savedName;
+  if (savedKey)  document.getElementById('api-key').value    = savedKey;
+
+  if (savedName || savedKey) {
+    document.getElementById('saved-creds-badge').style.display = 'inline-flex';
+  }
+
+  // Reconnect to active session if one exists
+  const storedSid = localStorage.getItem('vm_session');
+  if (storedSid) {
+    fetch(`/api/upload/session/${storedSid}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (!data.success || !data.session) return;
+        const s = data.session;
+
+        // Only reconnect if not too old and still has data
+        const started = new Date(s.startedAt);
+        const ageH    = (Date.now() - started.getTime()) / 3_600_000;
+        if (ageH > 23) { localStorage.removeItem('vm_session'); return; }
+
+        sessionId = storedSid;
+        const src = s.source || storedSid;
+        switchToStatus(src, storedSid);
+
+        jobs   = s.jobs || [];
+        stats  = s.stats;
+        jobMap = new Map(jobs.map((j, i) => [j.id, i]));
+        document.getElementById('queue-count').textContent = `${jobs.length} items`;
+        updateStats(stats);
+        renderVirtualList();
+
+        if (s.status === 'completed' || s.status === 'failed') {
+          showDoneBanner(s);
+          hideLoading();
+          document.getElementById('logo-dot').classList.remove('pulse');
+        } else {
+          connectSSE(storedSid);
+          showLoading('Reconnecting…');
+        }
+      })
+      .catch(() => localStorage.removeItem('vm_session'));
+  }
+})();
+</script>
+</body>
+</html>
