@@ -108,6 +108,8 @@ async function getYtDlpInfo(source) {
             "--flat-playlist",
             "--cookies",
             "cookies.txt",
+            "--js-runtime",
+            "node",
             source
         ]);
 
@@ -178,6 +180,10 @@ function uploadAudioStream(videoId, credentials, onProgress) {
             "-",
             "--newline",
             "--no-playlist",
+            "--cookies",
+            "cookies.txt",
+            "--js-runtime",
+            "node",
             url
         ]);
 
