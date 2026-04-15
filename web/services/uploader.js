@@ -105,11 +105,12 @@ async function getYtDlpInfo(source) {
     return new Promise((resolve, reject) => {
         const proc = spawn("yt-dlp", [
             "-J",
-            "--flat-playlist",
             "--cookies",
             "./cookies.txt",
             "--js-runtime",
             "node",
+            "--extractor-args",
+            "youtube:player_client=android",
             source
         ]);
 
