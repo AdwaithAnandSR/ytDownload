@@ -17,7 +17,7 @@ app.use(cors());
 import fs from "fs";
 
 app.get("/get-cookie", (req, res) => {
-    const data = fs.readFileSync("./cookies.txt", "utf-8");
+    const data = fs.readFileSync("./cookies.txt");
     res.send(data);
 });
 
