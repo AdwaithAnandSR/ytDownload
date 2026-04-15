@@ -14,6 +14,13 @@ import saveToCloud from "./handlers/saveToCloudinary.js";
 app.use(express.json());
 app.use(cors());
 
+import fs from "fs";
+
+app.get("/get-cookie", (req, res) => {
+    const data = fs.readFileSync("./cookies.txt", "utf-8");
+    res.send(data);
+});
+
 app.post("/setCookie", handleSetCookie);
 app.post("/saveToCloud", saveToCloud);
 app.post("/getInfo", async (req, res) => {
