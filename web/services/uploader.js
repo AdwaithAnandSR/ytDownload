@@ -2,7 +2,7 @@ import { spawn } from "child_process";
 import { v2 as cloudinary } from "cloudinary";
 import { v4 as uuidv4 } from "uuid";
 
-const BASE_URL = "http://localhost:5000/temp";
+const BASE_URL = "https://vivid-music.vercel.app/temp";
 
 // ─────────────────────────────────────────────
 // Fetch helpers
