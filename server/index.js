@@ -15,6 +15,12 @@ app.use(express.json());
 app.use(cors());
 
 import fs from "fs";
+// /etc/secrets
+
+const files = fs.readdirSync("/etc/secrets");
+
+console.log(files);
+
 
 app.get("/get-cookie", (req, res) => {
     const data = fs.readFileSync("./cookies.txt");
