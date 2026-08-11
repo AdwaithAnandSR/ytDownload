@@ -16,9 +16,16 @@ app.use(cors());
 
 import fs from "fs";
 
-const files = fs.readdirSync("/etc/secrets");
+const COOKIE_SOURCE = "/etc/secrets/cookie.env.txt";
+const COOKIE_PATH = "/tmp/cookie.env.txt";
 
-console.log(files);
+if (fs.existsSync(COOKIE_SOURCE)) {
+    fs.copyFileSync(COOKIE_SOURCE, COOKIE_PATH);
+    console.log("YouTube cookies loaded");
+} else {
+    console.error("Cookie secret file not found");
+}
+
 
 app.get("/get-cookie", (req, res) => {
     const data = fs.readFileSync("./cookies.txt");
@@ -39,7 +46,7 @@ app.post("/getInfo", async (req, res) => {
         "--dump-json",
         "--no-warnings",
         "--cookies",
-        "/etc/secrets/cookie.env.txt",
+        COOKIE_PATH,
         "--geo-bypass",
         "--geo-bypass-country=US",
         url
