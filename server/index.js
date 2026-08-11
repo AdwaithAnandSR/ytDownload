@@ -15,12 +15,6 @@ app.use(express.json());
 app.use(cors());
 
 import fs from "fs";
-// /etc/secrets
-
-const files = fs.readdirSync("/etc/secrets");
-
-console.log(files);
-
 
 app.get("/get-cookie", (req, res) => {
     const data = fs.readFileSync("./cookies.txt");
@@ -41,7 +35,7 @@ app.post("/getInfo", async (req, res) => {
         "--dump-json",
         "--no-warnings",
         "--cookies",
-        "./cookies.txt",
+        "./etc/secrets/cookie.env.txt",
         "--geo-bypass",
         "--geo-bypass-country=US",
         url
